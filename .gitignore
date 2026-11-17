@@ -95,6 +95,9 @@ dist/
 # Screenshots from npm run shots
 shots/
 
+# PDF from npm run export:pdf (CI attaches it to a GitHub Release)
+pdf/
+
 # Wrangler state from local Cloudflare commands
 .wrangler/
 

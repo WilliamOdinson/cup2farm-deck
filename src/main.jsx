@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
+import PrintDeck from "./PrintDeck.jsx";
 
 // Fonts ship with the app, so the deck never waits on a font CDN.
 // Keep in step with FONTS in scripts/build-standalone.mjs.
@@ -19,4 +20,10 @@ import "./styles.css";
 
 const el = document.getElementById("root");
 if (!el) throw new Error('The page is missing its <div id="root"> mount point.');
-createRoot(el).render(<App />);
+
+// "?print" lays the whole deck out as pages, for the PDF export and the print dialog.
+// The flag on <html> is set before the first render, so styles and slides can rely on it.
+const printing = new URLSearchParams(window.location.search).has("print");
+if (printing) document.documentElement.dataset.view = "print";
+
+createRoot(el).render(printing ? <PrintDeck /> : <App />);

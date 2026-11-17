@@ -10,9 +10,11 @@ const TABS = [
 
 const tabFor = (screen) => (screen === "scan" ? "scan" : screen === "passport" ? "passport" : "cup");
 
+// Nothing animates when the viewer asked for reduced motion, or when the deck is laid out for
+// print ("?print"), where every page has to be in its final state at once.
 const calmMotion = () => {
   try {
-    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    return document.documentElement.dataset.view === "print" || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   } catch {
     return true;
   }
