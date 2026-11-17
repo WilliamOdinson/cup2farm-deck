@@ -1,0 +1,48 @@
+name: Deploy Cup2Farm deck to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Deploys run one at a time, in order; a queued run is never cancelled.
+concurrency:
+  group: deploy-dt-pages
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # Vite 8 needs Node ^20.19 or >=22.12 (see "engines" in package.json).
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Presenter rules, timing and the ROI model. A failing test stops the deploy.
+      - name: Test
+        run: npm test
+
+      - name: Build deck
+        run: npm run build
+
+      # --branch=main makes this the production deployment, which the custom domain serves.
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist/ --project-name=dt-wsun --branch=main
