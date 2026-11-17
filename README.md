@@ -15,6 +15,7 @@ Live at **[95722-coda.pages.dev](https://95722-coda.pages.dev)**.
 - The references each slide cites in its footer, in APA 7 style, and the deck's address at bottom right
 - Speaker notes with per-slide timing and hand-over cues for seven presenters
 - Prepared answers for Q&A on the last slide
+- A PDF export with a page for every step, with real text and working links
 
 All lot, grower and receipt data in the prototype is sample data. Every QR code in the deck is real and opens the deck's own address.
 
@@ -36,7 +37,7 @@ Presenter names and timings appear only in the speaker notes (N) and the overvie
 
 Every slide has its own link, for example `95722-coda.pages.dev/#roi`.
 
-For a room with unreliable Wi-Fi, use `standalone/cup2farm-deck.html`. React, the fonts and the styles are inlined, so it opens from disk with no network.
+For a room with unreliable Wi-Fi, use `standalone/cup2farm-deck.html`. React, the fonts and the styles are inlined, so it opens from disk with no network. A PDF is the second fallback; see [PDF export](#pdf-export).
 
 ## Running locally
 
@@ -57,12 +58,15 @@ npm run dev
 | `npm test` | Presenter rules, talk timing, references, the QR code and the ROI model |
 | `npm run check:layout` | Opens every slide in Chromium, presses the right arrow through every step, clicks every toggle, and reports overflow or a step that does not respond |
 | `npm run shots` | Screenshots of every slide into `shots/`; add `-- --steps` for every step |
+| `npm run export:pdf` | Rebuilds the standalone file and prints the deck to `pdf/cup2farm-deck.pdf` |
 
-`check:layout` and `shots` need Playwright, which is not a dependency:
+`check:layout`, `shots` and `export:pdf` drive headless Chromium through Playwright. Playwright comes with `npm install`; its browser is a separate download, needed once:
 
 ```bash
-npm i -D playwright && npx playwright install chromium
+npx playwright install chromium
 ```
+
+To use a Chrome that is already installed instead, set `CHROME_PATH` to its executable.
 
 ## Editing
 
@@ -90,6 +94,19 @@ export function MySlide() {
 }
 MySlide.steps = ITEMS.length;
 ```
+
+## PDF export
+
+```bash
+npm run export:pdf                      # pdf/cup2farm-deck.pdf
+npm run export:pdf -- pdf/handout.pdf   # another file name
+```
+
+The PDF has one 16:9 page for every state the right arrow reaches, in talk order (98 pages for the 45 slides today), without the speaker notes. Text stays text, the deck's fonts are embedded, and the links in the footers work.
+
+It is printed from the deck's print view, which you can open yourself by adding `?print` to the address, for example `95722-coda.pages.dev/?print`. The browser's own print dialog works on that page too.
+
+The script fails instead of writing a bad file: it checks that every slide and step is there, that the fonts loaded, and that the PDF has exactly one sheet per page. Text is laid out without font hinting, the way macOS, Windows and print do it, so the PDF matches what the audience sees.
 
 ## Deployment
 

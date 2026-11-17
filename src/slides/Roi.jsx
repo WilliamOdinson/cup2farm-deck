@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { Icon, Slide, useStep } from "../ui/primitives.jsx";
 import { Cols, Strip } from "../ui/layout.jsx";
 import { ASSUMPTIONS, PRESETS, count, money, roi } from "../model/roi.js";
@@ -73,6 +73,7 @@ const SLIDERS = [
 // buttons clear, press the arrow (or a phase) and the model snaps back to that phase.
 export function RoiSlide() {
   const [step, setStep] = useStep();
+  const uid = useId(); // the print view shows this slide once per phase, so ids must not repeat
   const [input, setInput] = useState(PRESETS[step] ?? PRESETS[0]);
   useEffect(() => setInput(PRESETS[step] ?? PRESETS[0]), [step]);
   const r = useMemo(() => roi(input), [input]);
@@ -104,12 +105,12 @@ export function RoiSlide() {
           </div>
           {SLIDERS.map((s) => (
             <div className="roi__slider" key={s.key}>
-              <label htmlFor={`roi-${s.key}`}>
+              <label htmlFor={`${uid}-${s.key}`}>
                 <span>{s.label}</span>
                 <strong>{s.show(input[s.key])}</strong>
               </label>
               <input
-                id={`roi-${s.key}`}
+                id={`${uid}-${s.key}`}
                 type="range"
                 min={s.min}
                 max={s.max}
