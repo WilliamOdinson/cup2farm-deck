@@ -1,4 +1,4 @@
-name: Deploy Cup2Farm deck to Cloudflare Pages
+name: Deploy Cup2Farm deck and release its PDF
 
 on:
   push:
@@ -6,10 +6,13 @@ on:
       - main
   workflow_dispatch:
 
+# Read-only by default. The PDF job asks for write access, for itself only.
 permissions:
   contents: read
 
-# Deploys run one at a time, in order; a queued run is never cancelled.
+# One run at a time. A run in progress is never cancelled; if several pile up behind it,
+# only the newest one waits. The PDF release number relies on this: two runs side by side
+# could pick the same number.
 concurrency:
   group: deploy-dt-pages
   cancel-in-progress: false
@@ -46,3 +49,61 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy dist/ --project-name=95722-coda --branch=main
+
+  # After a successful deploy, the same commit is exported to PDF and attached to a new
+  # GitHub Release. The number counts up: release v8 carries cup2farm-deck-v8.pdf, and the
+  # next run makes v9. It is one more than the highest v<N> tag, so it never repeats.
+  release-pdf:
+    name: Release the PDF
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write # create the tag and the release
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Playwright's headless Chromium, plus the system libraries it needs on a bare runner.
+      - name: Install Chromium
+        run: npx playwright install --with-deps --only-shell chromium
+
+      - name: Pick the next release number
+        id: next
+        run: |
+          number="$(node scripts/next-release-number.mjs)"
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+
+      # Rebuilds the standalone deck from this commit, prints it, and checks the page count.
+      - name: Export the deck to PDF
+        id: pdf
+        env:
+          NUMBER: ${{ steps.next.outputs.number }}
+        run: npm run export:pdf -- "pdf/cup2farm-deck-v$NUMBER.pdf"
+
+      # The tag is created here, on the commit that was just deployed.
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUMBER: ${{ steps.next.outputs.number }}
+          PDF: ${{ steps.pdf.outputs.file }}
+          PAGES: ${{ steps.pdf.outputs.pages }}
+          SLIDES: ${{ steps.pdf.outputs.slides }}
+          SITE: ${{ steps.pdf.outputs.site }}
+        run: |
+          gh release create "v$NUMBER" "$PDF" \
+            --target "$GITHUB_SHA" \
+            --title "Cup2Farm deck v$NUMBER" \
+            --notes "PDF of the deck as deployed from commit ${GITHUB_SHA::7}: $PAGES pages, one for every step of the $SLIDES slides. Live deck: $SITE" \
+            --generate-notes \
+            --latest
