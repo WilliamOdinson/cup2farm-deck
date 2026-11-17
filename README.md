@@ -76,16 +76,16 @@ To add a slide, add an entry to `OUTLINE` in `src/content/outline.js` and regist
 
 ## Deployment
 
-Pushing to `main` runs `.github/workflows/deploy.yml`, which tests, builds and deploys `dist/` to the Cloudflare Pages project `digital-transformation`.
+Pushing to `main` runs `.github/workflows/deploy.yml`, which tests, builds and deploys `dist/` to the Cloudflare Pages project `95722-coda`.
 
 One-time setup:
 
 1. Add the repository secrets `CLOUDFLARE_API_TOKEN` (with Cloudflare Pages edit permission) and `CLOUDFLARE_ACCOUNT_ID`.
 2. Create the Pages project:
    ```bash
-   npx wrangler pages project create digital-transformation --production-branch=main
+   npx wrangler pages project create 95722-coda --production-branch=main
    ```
-3. In the Cloudflare dashboard, open Workers & Pages, then `digital-transformation`, then Custom domains, and add `dt.wsun.io`.
+3. In the Cloudflare dashboard, open Workers & Pages, then `95722-coda`, then Custom domains, and add `dt.wsun.io`.
 
 ## Sources
 
