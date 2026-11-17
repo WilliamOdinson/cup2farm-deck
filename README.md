@@ -55,7 +55,7 @@ npm run dev
 | `npm run preview` | Serve the production build |
 | `npm run build:standalone` | Rebuild `standalone/cup2farm-deck.html` |
 | `npm run gen:qr` | Regenerate the QR matrix after changing the site address |
-| `npm test` | Presenter rules, talk timing, references, the QR code and the ROI model |
+| `npm test` | Presenter rules, talk timing, references, the QR code, the ROI model and release numbering |
 | `npm run check:layout` | Opens every slide in Chromium, presses the right arrow through every step, clicks every toggle, and reports overflow or a step that does not respond |
 | `npm run shots` | Screenshots of every slide into `shots/`; add `-- --steps` for every step |
 | `npm run export:pdf` | Rebuilds the standalone file and prints the deck to `pdf/cup2farm-deck.pdf` |
@@ -108,11 +108,21 @@ It is printed from the deck's print view, which you can open yourself by adding 
 
 The script fails instead of writing a bad file: it checks that every slide and step is there, that the fonts loaded, and that the PDF has exactly one sheet per page. Text is laid out without font hinting, the way macOS, Windows and print do it, so the PDF matches what the audience sees.
 
+Every deploy publishes this PDF as a numbered GitHub Release; see [PDF releases](#pdf-releases).
+
 ## Deployment
 
-Pushing to `main` runs `.github/workflows/deploy.yml`, which tests, builds and deploys `dist/` to the Cloudflare Pages project `95722-coda`.
+Pushing to `main` runs `.github/workflows/deploy.yml`, which tests, builds and deploys `dist/` to the Cloudflare Pages project `95722-coda`, and then releases the deck as a PDF.
 
-One-time setup:
+### PDF releases
+
+After every successful deploy, a second job exports the same commit to PDF and attaches it to a new GitHub Release. The number counts up: release `v8` carries `cup2farm-deck-v8.pdf`, and the next run makes `v9`. The newest PDF is always on the repository's [latest release](https://github.com/WilliamOdinson/cup2farm-deck/releases/latest).
+
+The number is one more than the highest `v<N>` tag (`node scripts/next-release-number.mjs` prints it), so it never repeats, and a failed run does not use one up. If tests or the deploy fail, nothing is released.
+
+This needs no setup: the job uses the workflow's own token, with write access to contents for that job only.
+
+### One-time setup
 
 1. Add the repository secrets `CLOUDFLARE_API_TOKEN` (with Cloudflare Pages edit permission) and `CLOUDFLARE_ACCOUNT_ID`.
 2. Create the Pages project:
