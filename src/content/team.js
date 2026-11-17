@@ -1,5 +1,6 @@
-// Who presents what. Edit here; the title slide, agenda, slide headers, control bar and
-// speaker notes all read from this file.
+// Who presents what. Edit here; the title slide, the agenda, the overview and the speaker
+// notes all read from this file. A slide does not say who presents it: that is shown in the
+// speaker notes and the overview only.
 //
 // Rules the deck is built around (checked by `npm test`):
 //   - every part has exactly one presenter
@@ -8,9 +9,6 @@
 export const TEAM = {
   name: "Team Coda",
   members: ["Ang Li", "Guhan Kesavasamy", "Hao Li", "Junhong Lin", "Lisa Chung", "William Sun", "Yilin Wang"],
-  course: "95-722 Digital Transformation",
-  module: "Data Adoption module",
-  date: "November 2026",
 };
 
 /** Team names as one line of text in which a name never breaks across lines. */
@@ -30,6 +28,5 @@ export const PARTS = [
   { id: "tech", section: 3, label: "Technology and management", presenter: "Lisa Chung" },
   { id: "risk", section: 3, label: "Risks and competition", presenter: "Yilin Wang" },
   { id: "close", section: 4, label: "Conclusions", presenter: "Yilin Wang" },
-  { id: "refs", section: 5, label: "References", presenter: "Yilin Wang" },
   { id: "qa", section: 5, label: "Q&A", presenter: "Everyone" },
 ];

@@ -1,7 +1,7 @@
-import { Cup, Icon, Receipt, Slide, Src } from "../ui/primitives.jsx";
+import { Cup, Icon, Receipt, Slide } from "../ui/primitives.jsx";
 import { Cols, Strip } from "../ui/layout.jsx";
 import { TEAM, teamLine } from "../content/team.js";
-import { totalSecs, turns } from "../content/outline.js";
+import { turns } from "../content/outline.js";
 
 export function TitleSlide() {
   return (
@@ -11,17 +11,10 @@ export function TitleSlide() {
           <p className="t-kicker">Coda Coffee Benevolence Strategy</p>
           <h1 className="t-title">Cup2Farm</h1>
           <p className="t-sub">A code on every cup that shows the farmer was paid, and carries a thank-you back.</p>
-          <div className="t-meta">
-            <p>
-              <strong>{TEAM.name}</strong>
-              <span>{teamLine()}</span>
-            </p>
-            <p>
-              <strong>{TEAM.course}</strong>
-              <span>{TEAM.module}</span>
-              <span>{TEAM.date}</span>
-            </p>
-          </div>
+          <p className="t-meta">
+            <strong>{TEAM.name}</strong>
+            <span>{teamLine()}</span>
+          </p>
         </div>
         <div className="t-art" aria-hidden="true">
           <div className="t-cup">
@@ -46,8 +39,6 @@ export function TitleSlide() {
   );
 }
 
-const fmt = (secs) => `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
-
 const COUNT_WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
 
 export function AgendaSlide() {
@@ -56,22 +47,17 @@ export function AgendaSlide() {
   const word = COUNT_WORDS[voices] || String(voices);
   let n = 0;
   return (
-    <Slide
-      title={`${word} ${voices === 1 ? "voice" : "voices"}, one recommendation`}
-      sources={<span>Planned talk time {fmt(totalSecs())} of 30:00. Reference slides are kept for Q&A and carry no speaking time.</span>}
-    >
+    <Slide title={`${word} ${voices === 1 ? "voice" : "voices"}, one recommendation`}>
       <ol className={`agenda ${rows.length > 9 ? "agenda--dense" : ""}`}>
         {rows.map((t, i) => {
           const isQa = t.parts.every((p) => p.id === "qa");
-          const named = t.parts.filter((p) => p.id !== "refs");
-          const label = (named.length ? named : t.parts).map((p) => p.label).join(", ");
+          const label = t.parts.map((p) => p.label).join(", ");
           if (!isQa) n += 1;
           return (
             <li key={`${t.presenter}-${i}`} className="agenda__row">
               <span className="agenda__n">{isQa ? "" : n}</span>
               <span className="agenda__who">{t.presenter}</span>
               <span className="agenda__part">{label}</span>
-              <span className="agenda__time">{isQa ? "after" : fmt(t.secs)}</span>
             </li>
           );
         })}
@@ -88,7 +74,7 @@ const STEPS = [
 
 export function BlufSlide() {
   return (
-    <Slide title="Our recommendation: one feature, three taps" sources={<Src>Case; Urban and Sultan 2015.</Src>}>
+    <Slide title="Our recommendation: one feature, three taps">
       <ol className="steps3">
         {STEPS.map((s, i) => (
           <li key={s.name} className="steps3__item">
@@ -125,7 +111,7 @@ const WHY = [
 
 export function WhySlide() {
   return (
-    <Slide title="Why this one area" sources={<Src>Case; Urban and Sultan 2015.</Src>}>
+    <Slide title="Why this one area">
       <Cols items={WHY} />
       <Strip icon="target">
         <strong>One area, on purpose.</strong> Ordering and loyalty points belong to other areas of the future app.

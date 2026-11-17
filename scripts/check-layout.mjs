@@ -1,6 +1,9 @@
-// Layout check: opens every slide, clicks through every toggle, and reports anything that
-// spills outside the stage, runs into the footer, or overflows its own card.
-// Run it after editing slide text or names. Exits non-zero when it finds a problem.
+// Layout check: opens every slide, presses the right arrow through every step, clicks every
+// toggle, and reports anything that spills outside the stage, runs into the footer, or
+// overflows its own card. It also checks the arrow keys themselves: each press changes the
+// slide, the press after the last step opens the next slide, and the left arrow comes back
+// to that last step.
+// Run it after editing slide text, references or names. Exits non-zero when it finds a problem.
 //   npm run check:layout
 import { openDeck, run, slideIds } from "./lib/browser.mjs";
 
@@ -34,15 +37,19 @@ const measure = () => {
     }
     if (art || cs.display === "inline" || cs.display === "contents") continue;
 
-    // 3. Child boxes stay inside their parent box.
-    if (cs.overflowX === "visible" && cs.overflowY === "visible") {
+    // 3. Child boxes stay inside their parent's content box, so nothing eats into its padding.
+    //    Table rows are skipped (collapsed borders overlap their cells), and so are inline
+    //    children, which rule 4 covers as text (a hanging indent starts in the padding).
+    if (cs.overflowX === "visible" && cs.overflowY === "visible" && !cs.display.startsWith("table")) {
+      const edge = (side) => parseFloat(cs[`padding${side}`]) + parseFloat(cs[`border${side}Width`]);
+      const box = { top: r.top + edge("Top"), bottom: r.bottom - edge("Bottom"), left: r.left + edge("Left"), right: r.right - edge("Right") };
       for (const child of el.children) {
         const cc = getComputedStyle(child);
-        if (cc.position === "absolute" || cc.position === "fixed" || child.closest("svg")) continue;
+        if (cc.position === "absolute" || cc.position === "fixed" || cc.display === "inline" || child.closest("svg")) continue;
         const c = child.getBoundingClientRect();
         if (c.width === 0 || c.height === 0) continue;
-        if (c.bottom > r.bottom + 2 || c.top < r.top - 2) out.add(`${name(child)} is taller than ${name(el)} by ${px(Math.max(c.bottom - r.bottom, r.top - c.top))}px`);
-        if (c.right > r.right + 2 || c.left < r.left - 2) out.add(`${name(child)} is wider than ${name(el)} by ${px(Math.max(c.right - r.right, r.left - c.left))}px`);
+        if (c.bottom > box.bottom + 2 || c.top < box.top - 2) out.add(`${name(child)} is taller than ${name(el)} by ${px(Math.max(c.bottom - box.bottom, box.top - c.top))}px`);
+        if (c.right > box.right + 2 || c.left < box.left - 2) out.add(`${name(child)} is wider than ${name(el)} by ${px(Math.max(c.right - box.right, box.left - c.left))}px`);
       }
     }
     // 4. Text stays inside the element that holds it (line boxes, with slack for tight leading).
@@ -70,6 +77,17 @@ const measurePanel = () => {
   return out;
 };
 
+// Runs in the page: where the deck is, and what the slide says there.
+const where = () => {
+  const stage = document.querySelector(".deck__stage");
+  return {
+    id: window.location.hash.replace(/^#/, ""),
+    step: Number(stage.dataset.step),
+    steps: Number(stage.dataset.steps),
+    text: document.querySelector(".slide").innerText,
+  };
+};
+
 await run(async () => {
   const deck = await openDeck();
   const { page } = deck;
@@ -77,13 +95,40 @@ await run(async () => {
   let states = 0;
 
   try {
-    for (const id of slideIds) {
+    for (const [at, id] of slideIds.entries()) {
       await deck.show(id);
       const check = async (label) => {
         states += 1;
         for (const found of await page.evaluate(measure)) problems.push(`${id} [${label}] ${found}`);
       };
+      const press = async (key) => {
+        await page.keyboard.press(key);
+        await page.waitForTimeout(80);
+        return page.evaluate(where);
+      };
       await check("default");
+
+      // The right arrow walks every step of the slide, and each press changes what it shows.
+      let now = await page.evaluate(where);
+      const { steps } = now;
+      if (now.step !== 1) problems.push(`${id} opens on step ${now.step}, not step 1`);
+      for (let s = 2; s <= steps; s++) {
+        const before = now.text;
+        now = await press("ArrowRight");
+        if (now.id !== id || now.step !== s) problems.push(`${id} right arrow from step ${s - 1} went to ${now.id} step ${now.step}`);
+        if (now.text === before) problems.push(`${id} step ${s} shows nothing new`);
+        await check(`step ${s} of ${steps}`);
+      }
+      // One more press leaves for the next slide; the left arrow returns to the last step.
+      const nextId = slideIds[at + 1] ?? id;
+      now = await press("ArrowRight");
+      if (now.id !== nextId) problems.push(`${id} right arrow after the last step went to ${now.id}, not ${nextId}`);
+      if (nextId !== id) {
+        now = await press("ArrowLeft");
+        if (now.id !== id || now.step !== steps) problems.push(`${nextId} left arrow went to ${now.id} step ${now.step}, not ${id} step ${steps}`);
+        await check(`back on step ${steps}`);
+      }
+
       // Every toggle outside the phone, one at a time.
       const controls = page.locator(".slide button[aria-pressed]:not(.phone *)");
       const n = await controls.count();

@@ -1,5 +1,7 @@
 import { createContext, useContext, useMemo } from "react";
 import { QR_ROWS } from "../content/qr.js";
+import { SITE_URL } from "../content/site.js";
+import { refsFor } from "../content/sources.js";
 
 /* ---------- Icons: small stroke set drawn for this deck ---------- */
 const ICONS = {
@@ -156,40 +158,79 @@ export function Icon({ name, className = "", title }) {
 }
 
 /* ---------- Slide frame ---------- */
-export const SlideMeta = createContext({ index: 0, total: 1, sectionNo: null, sectionLabel: "", presenter: "" });
+// What the deck tells the slide on stage: its rubric section, what it cites, and which step of
+// the slide is showing. `setStep` lets a click on the slide move the deck to that step.
+export const SlideMeta = createContext({ sectionNo: null, sectionLabel: "", refs: [], footnote: "", step: 0, setStep: () => {} });
 
-export function Slide({ variant = "paper", title, lede, sources, children, className = "", hideHead = false }) {
+/**
+ * The step this slide is on, and a setter. Slides with several states (a timeline, a set of
+ * tabs) read their selection from here, so the right arrow walks through them in order and a
+ * click lands on the same state the arrow would. A slide says how many steps it has with a
+ * static `steps` property on its component.
+ */
+export function useStep() {
+  const { step, setStep } = useContext(SlideMeta);
+  return [step, setStep];
+}
+
+/* One APA reference: *asterisks* in the text become italics, the URL becomes a link. */
+function Reference({ text, url }) {
+  const parts = text.split("*");
+  return (
+    <p className="refs__item">
+      {parts.map((part, i) => (i % 2 ? <em key={i}>{part}</em> : part))}
+      {url && (
+        <>
+          {" "}
+          <a href={url} target="_blank" rel="noopener noreferrer">
+            {url}
+          </a>
+        </>
+      )}
+    </p>
+  );
+}
+
+/* Slide footer: the references this slide cites (APA order), then the site address. */
+export function Foot({ children }) {
+  const { refs, footnote } = useContext(SlideMeta);
+  const list = refsFor(refs);
+  return (
+    <footer className="foot">
+      <div className="refs">
+        {children}
+        {list.map((r) => (
+          <Reference key={r.id} text={r.text} url={r.url} />
+        ))}
+        {footnote && (
+          <p className="refs__item">
+            <em>Note.</em> {footnote}
+          </p>
+        )}
+      </div>
+      <a className="foot__site" href={SITE_URL} target="_blank" rel="noopener noreferrer">
+        {SITE_URL}
+      </a>
+    </footer>
+  );
+}
+
+export function Slide({ variant = "paper", title, lede, children, className = "", hideHead = false }) {
   const meta = useContext(SlideMeta);
   return (
     <section className={`slide slide--${variant} ${className}`} aria-label={typeof title === "string" ? title : undefined}>
       <header className="slide__head">
         {!hideHead && (
-          <div className="slide__meta">
-            <p className="sec">
-              {meta.sectionNo && <span className="sec__n">{meta.sectionNo}</span>}
-              {meta.sectionLabel}
-            </p>
-            {meta.presenter && (
-              <p className="who">
-                <Icon name="user" />
-                {meta.presenter}
-              </p>
-            )}
-          </div>
+          <p className="sec">
+            {meta.sectionNo && <span className="sec__n">{meta.sectionNo}</span>}
+            {meta.sectionLabel}
+          </p>
         )}
         {!hideHead && title && <h2 className="title">{title}</h2>}
         {!hideHead && lede && <p className="lede">{lede}</p>}
       </header>
       <div className="slide__body">{children}</div>
-      <footer className="foot">
-        <div className="foot__src">{sources}</div>
-        <div className="foot__mark">
-          <span>Cup2Farm</span>
-          <span className="foot__num">
-            {String(meta.index + 1).padStart(2, "0")} / {String(meta.total).padStart(2, "0")}
-          </span>
-        </div>
-      </footer>
+      <Foot />
     </section>
   );
 }
@@ -211,8 +252,8 @@ export function Stamp({ children, style }) {
   );
 }
 
-/* ---------- QR code (real, scannable matrix generated at dev time) ---------- */
-export function QR({ size = 120, fg = "#1f1215", bg = "#ffffff", quiet = 2, title = "Sample QR code" }) {
+/* ---------- QR code: a real, scannable matrix that opens the deck's own address (see site.js) ---------- */
+export function QR({ size = 120, fg = "#1f1215", bg = "#ffffff", quiet = 2, title = "QR code that opens this deck" }) {
   const n = QR_ROWS.length;
   const d = useMemo(() => {
     let p = "";
@@ -305,9 +346,4 @@ export function Receipt({ head, rows, stamp, style, className = "" }) {
       )}
     </div>
   );
-}
-
-/* Small helper for consistent source lines */
-export function Src({ children }) {
-  return <span>Sources: {children}</span>;
 }

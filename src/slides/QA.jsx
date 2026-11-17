@@ -1,76 +1,7 @@
-import { useEffect, useState } from "react";
-import { Cup, Icon, Slide } from "../ui/primitives.jsx";
-import { SOURCES } from "../content/sources.js";
-import { ASSUMPTIONS, PRESETS, count, money } from "../model/roi.js";
+import { useEffect } from "react";
+import { Cup, Icon, Slide, useStep } from "../ui/primitives.jsx";
 import { teamLine } from "../content/team.js";
-
-/* ---------- Sources, one group per slide ---------- */
-function SourcesSlide({ id }) {
-  const g = SOURCES.find((s) => s.id === id);
-  return (
-    <Slide title={`Sources: ${g.group.toLowerCase()}`}>
-      <ol className={`srcs ${g.items.length > 5 ? "srcs--two" : ""}`}>
-        {g.items.map((s) => (
-          <li key={s.cite}>
-            <p className="srcs__cite">
-              {s.url ? (
-                <a href={s.url} target="_blank" rel="noopener noreferrer">
-                  {s.cite}
-                </a>
-              ) : (
-                s.cite
-              )}
-            </p>
-            <p className="srcs__used">{s.used}</p>
-          </li>
-        ))}
-      </ol>
-    </Slide>
-  );
-}
-
-export const SourcesCourseSlide = () => <SourcesSlide id="course" />;
-export const SourcesMarketSlide = () => <SourcesSlide id="market" />;
-export const SourcesCompanySlide = () => <SourcesSlide id="company" />;
-
-/* ---------- Model assumptions ---------- */
-export function AssumptionsSlide() {
-  const a = ASSUMPTIONS;
-  // Lowest and highest value of one scenario input across the phases, e.g. "2 to 3%".
-  const span = (pick, show, unit = "") => {
-    const xs = PRESETS.map(pick);
-    const lo = show(Math.min(...xs));
-    const hi = show(Math.max(...xs));
-    return lo === hi ? `${lo}${unit}` : `${lo} to ${hi}${unit}`;
-  };
-  const pct = (x) => `${Math.round(x * 100)}`;
-  const rows = [
-    ["Coffee carrying the code", `${span((p) => p.pounds, count)} lb a year`, "scenario; Coda roasted about 500K lb in 2013"],
-    ["Scan rate, thank rate", `${span((p) => p.scanRate, pct, "%")}, ${span((p) => p.thankRate, pct, "%")}`, "scenario; the pilot measures both"],
-    ["Cups per pound of coffee", `${a.cupsPerPound}`, "12 oz cups at 20 g each"],
-    ["Scans per scanning drinker", `${a.scansPerPerson} a year`, "team estimate"],
-    ["Profit per engaged drinker", `${money(a.profitPerDrinker)} a year`, "about $150 in bags and visits at 40% margin"],
-    ["Lift in sales potential", `${Math.round(a.researchLift * 100)}%`, "Urban and Sultan 2015"],
-    ["Lift that carries over", `${Math.round(a.liftTransfer * 100)}%`, "team estimate; the study required app use"],
-    ["Profit per wholesale account", `${money(a.profitPerAccount)} a year`, "about 60 lb a week at $2 a pound of margin"],
-    ["Program cost", `${span((p) => p.cost, (x) => `$${count(x)}`)} a year`, "team estimate by phase"],
-  ];
-  return (
-    <Slide title="Model assumptions" sources={<span>Team estimates for illustration, not Coda financials. 2013 volume: Confluence Denver 2013.</span>}>
-      <table className="kpi kpi--assume">
-        <tbody>
-          {rows.map(([name, value, basis]) => (
-            <tr key={name}>
-              <th scope="row">{name}</th>
-              <td>{value}</td>
-              <td>{basis}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Slide>
-  );
-}
+import { SITE_URL } from "../content/site.js";
 
 /* ---------- Q&A: the last slide ---------- */
 const ANSWERS = [
@@ -112,18 +43,21 @@ const ANSWERS = [
   },
 ];
 
+// Step 0 is the closing slide. Each further press of the right arrow shows one prepared
+// answer, so the backup material needs no mouse; Escape or Close returns to the closing slide.
 export function QASlide() {
-  const [open, setOpen] = useState(false);
-  const [sel, setSel] = useState(0);
+  const [step, setStep] = useStep();
+  const open = step > 0;
+  const sel = Math.min(ANSWERS.length, Math.max(1, step)) - 1;
 
   useEffect(() => {
     if (!open) return undefined;
     const onKey = (e) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") setStep(0);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  }, [open, setStep]);
 
   return (
     <Slide variant="stage" hideHead className="s-qa">
@@ -133,7 +67,7 @@ export function QASlide() {
           <h2 className="qa__big">Questions?</h2>
           <p className="qa__line">Farm2Cup made Coda worth trusting. Cup2Farm lets people feel it.</p>
           <p className="qa__team">{teamLine()}</p>
-          <button className="qa__btn" onClick={() => setOpen(true)} data-noswipe>
+          <button className="qa__btn" onClick={() => setStep(1)} data-noswipe>
             <Icon name="message" /> Prepared answers
           </button>
         </div>
@@ -146,7 +80,7 @@ export function QASlide() {
         <div className="qa__panel" role="dialog" aria-label="Prepared answers" data-noswipe>
           <div className="qa__panel-head">
             <h3>Prepared answers</h3>
-            <button className="qa__close" onClick={() => setOpen(false)}>
+            <button className="qa__close" onClick={() => setStep(0)}>
               <Icon name="x" /> Close
             </button>
           </div>
@@ -154,7 +88,7 @@ export function QASlide() {
             <ul className="qa__qs">
               {ANSWERS.map((x, i) => (
                 <li key={x.q}>
-                  <button className={i === sel ? "is-on" : ""} onClick={() => setSel(i)} aria-pressed={i === sel}>
+                  <button className={i === sel ? "is-on" : ""} onClick={() => setStep(i + 1)} aria-pressed={i === sel}>
                     {x.q}
                   </button>
                 </li>
@@ -165,8 +99,12 @@ export function QASlide() {
               <p>{ANSWERS[sel].a}</p>
             </div>
           </div>
+          <a className="foot__site qa__site" href={SITE_URL} target="_blank" rel="noopener noreferrer">
+            {SITE_URL}
+          </a>
         </div>
       )}
     </Slide>
   );
 }
+QASlide.steps = ANSWERS.length + 1;

@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Icon, Slide, Src, Tag } from "../ui/primitives.jsx";
+import { Icon, Slide, Tag, useStep } from "../ui/primitives.jsx";
 import { Cols, Strip } from "../ui/layout.jsx";
 
 /* ---------- Sources of data, by what collects it ---------- */
@@ -54,11 +53,12 @@ const COLLECTORS = [
   },
 ];
 
+// One collector per press, from the machine at origin to the drinker's phone.
 export function DataSourcesSlide() {
-  const [sel, setSel] = useState(0);
+  const [sel, setSel] = useStep();
   const c = COLLECTORS[sel];
   return (
-    <Slide title="Every screen runs on data that is already being collected" sources={<Src>Case; Bext360.</Src>}>
+    <Slide title="Every screen runs on data that is already being collected">
       <div className="dmap" data-noswipe>
         <div className="dmap__list" role="group" aria-label="Who collects the data">
           {COLLECTORS.map((k, i) => (
@@ -89,6 +89,7 @@ export function DataSourcesSlide() {
     </Slide>
   );
 }
+DataSourcesSlide.steps = COLLECTORS.length;
 
 /* ---------- Minimal collection from drinkers ---------- */
 const FIELDS = [
@@ -102,7 +103,7 @@ const FIELDS = [
 
 export function SixFieldsSlide() {
   return (
-    <Slide title="From drinkers: six fields, and only when they act" sources={<Src>Lecture (data collection considerations).</Src>}>
+    <Slide title="From drinkers: six fields, and only when they act">
       <div className="fields">
         {FIELDS.map((f) => (
           <div className="fields__item" key={f.head}>
@@ -149,7 +150,7 @@ const LEARN = [
 
 export function LearnSlide() {
   return (
-    <Slide title="What the data lets Coda do" sources={<Src>Lecture (descriptive, predictive and prescriptive analytics); Case.</Src>}>
+    <Slide title="What the data lets Coda do">
       <Cols items={LEARN} />
       <Strip icon="loop">The same feedback goes back to the farmers, so the data serves the people it describes.</Strip>
     </Slide>

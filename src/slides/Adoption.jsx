@@ -1,9 +1,9 @@
-import { Slide, Src } from "../ui/primitives.jsx";
+import { Slide } from "../ui/primitives.jsx";
 import { Rows, Stat, Strip } from "../ui/layout.jsx";
 
 export function FrictionSlide() {
   return (
-    <Slide title="Low friction: nothing to install, nothing to sign" sources={<Src>AppsFlyer 2026; Uniqode 2026.</Src>}>
+    <Slide title="Low friction: nothing to install, nothing to sign">
       <div className="stats stats--3" style={{ "--n": 3 }}>
         <Stat
           value="3%"
@@ -34,7 +34,7 @@ function arc(cx, cy, r, a0, a1) {
 export function MotiveSlide() {
   const colors = ["#c5162e", "#1e7fa8", "#b87c00"];
   return (
-    <Slide title="A real motive, not a hook" sources={<Src>Lecture (algorithmic experience wheel: intent, interact, identity).</Src>}>
+    <Slide title="A real motive, not a hook">
       <div className="motive">
         <svg className="motive__wheel" viewBox="0 0 460 460" role="img" aria-label="A wheel with three segments: intent, interact, identity">
           <defs>
@@ -80,7 +80,7 @@ const RETURN = [
 
 export function ReturnSlide() {
   return (
-    <Slide title="Four honest reasons to come back" sources={<Src>Urban and Sultan 2015 (Liberty Mutual study).</Src>}>
+    <Slide title="Four honest reasons to come back">
       <Rows items={RETURN} n={2} />
       <Strip icon="star">
         Users rated Liberty Mutual’s benevolent app above 4 out of 5 for being meaningful, believable and relevant.

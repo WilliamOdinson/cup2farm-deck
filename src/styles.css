@@ -222,6 +222,13 @@ a {
   background: var(--on-dark);
 }
 
+/* Shown on slides that the arrow walks through in several steps. */
+.bar__step {
+  white-space: nowrap;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+
 .bar__count {
   font-family: var(--font-mono);
   font-size: 13px;
@@ -487,40 +494,60 @@ a {
   flex-direction: column;
 }
 
+/* Footer: what the slide cites, in APA style, and the deck's address at bottom right.
+   The text is small, so it takes the stronger secondary ink to stay readable. */
 .foot {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 32px;
-  font-size: 15.5px;
-  line-height: 1.35;
-  color: var(--ink-3);
+  gap: 40px;
+  color: var(--ink-2);
   padding-top: 12px;
   min-height: 34px;
 }
 
 .slide--stage .foot {
-  color: var(--on-dark-3);
+  color: var(--on-dark-2);
 }
 
-.foot__src {
-  max-width: 1180px;
+.refs {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 3px;
 }
 
-.foot__mark {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-  white-space: nowrap;
-  font-family: var(--font-display);
-  font-weight: 600;
+/* APA reference list entry: hanging indent, italic titles, the URL allowed to wrap. */
+.refs__item {
+  margin: 0;
+  padding-left: 1.6em;
+  text-indent: -1.6em;
+  font-size: 13px;
+  line-height: 1.32;
+  overflow-wrap: anywhere;
+}
+
+.refs__item a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.refs__item a:hover {
+  text-decoration: underline;
+}
+
+.foot__site {
+  flex: none;
   font-size: 15px;
+  font-weight: 600;
+  line-height: 1.32;
+  white-space: nowrap;
+  color: inherit;
+  text-decoration: none;
 }
 
-.foot__num {
-  font-family: var(--font-mono);
-  font-weight: 500;
-  font-size: 14px;
+.foot__site:hover {
+  text-decoration: underline;
 }
 
 /* ---------- Shared pieces ---------- */
@@ -936,32 +963,21 @@ a {
   text-wrap: balance;
 }
 
-/* Team names take the room the course block leaves; the course block never wraps. */
+/* Team name and members under the subtitle. */
 .t-meta {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 48px;
-  align-items: start;
-  margin-top: 60px;
-  font-size: 25px;
-  line-height: 1.4;
-}
-
-.t-meta p {
-  margin: 0;
-  display: grid;
   gap: 2px;
+  margin: 60px 0 0;
   padding-top: 14px;
   border-top: 2px solid rgba(251, 243, 236, 0.28);
-  min-width: 0;
-}
-
-.t-meta p:last-child {
-  white-space: nowrap;
+  font-size: 25px;
+  line-height: 1.4;
+  max-width: 800px;
 }
 
 .t-meta span {
   color: var(--on-dark-2);
+  text-wrap: balance;
 }
 
 .t-art {
@@ -1047,7 +1063,7 @@ a {
 
 .agenda__row {
   display: grid;
-  grid-template-columns: 56px 400px 1fr 120px;
+  grid-template-columns: 56px 400px 1fr;
   gap: 28px;
   align-items: baseline;
   padding: 15px 0;
@@ -1076,14 +1092,6 @@ a {
   color: var(--ink-2);
 }
 
-.agenda__time {
-  font-family: var(--font-mono);
-  font-size: 28px;
-  color: var(--ink-2);
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
 /* More than nine turns: tighten so the list still fits the stage */
 .agenda--dense .agenda__row {
   padding: 8px 0;
@@ -1096,10 +1104,6 @@ a {
 
 .agenda--dense .agenda__part {
   font-size: 25px;
-}
-
-.agenda--dense .agenda__time {
-  font-size: 22px;
 }
 
 /* ---------- 1. Problem scoping ---------- */
@@ -1629,6 +1633,17 @@ a {
 .spec__zone {
   border-top: 4px solid var(--ink);
   padding-top: 12px;
+  transition: opacity 160ms;
+}
+
+/* While the arrow walks the spectrum, the zone it is on stays lit and the rest step back. */
+.spec__board.is-walking .spec__zone {
+  opacity: 0.38;
+}
+
+.spec__board.is-walking .spec__zone.is-on {
+  opacity: 1;
+  border-top-color: var(--cherry);
 }
 
 .spec__zname {
@@ -1811,25 +1826,6 @@ a {
 }
 
 /* ---------- Prototype slide ---------- */
-.who {
-  margin: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--ink-3);
-  white-space: nowrap;
-}
-
-.who svg {
-  font-size: 22px;
-}
-
-.slide--stage .who {
-  color: var(--on-dark-3);
-}
-
 .proto {
   display: grid;
   grid-template-columns: 430px 1fr;
@@ -1850,18 +1846,7 @@ a {
   padding-top: 6px;
 }
 
-.proto__meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.proto__meta .sec {
-  margin: 0;
-}
-
 .proto__side .title {
-  margin-top: 10px;
   font-size: 54px;
 }
 
@@ -1973,7 +1958,7 @@ a {
   justify-content: space-between;
   align-items: center;
   margin-top: 16px;
-  color: var(--ink-3);
+  color: var(--ink-2);
 }
 
 /* ---------- The phone ---------- */
@@ -2729,7 +2714,7 @@ a {
 }
 
 .dmap__detail {
-  padding: 36px 44px 40px;
+  padding: 32px 44px 34px;
   align-self: stretch;
   min-height: 0;
 }
@@ -2744,7 +2729,7 @@ a {
 .dmap__name {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 56px;
+  font-size: 50px;
   line-height: 1.1;
   margin: 0;
 }
@@ -2756,7 +2741,7 @@ a {
 }
 
 .dmap__label {
-  margin: 30px 0 12px;
+  margin: 26px 0 12px;
   font-size: 24px;
   font-weight: 700;
   color: var(--cherry-deep);
@@ -2800,6 +2785,15 @@ a {
   border: 1px solid var(--rule);
   border-radius: 18px;
   padding: 30px;
+}
+
+/* Six cards above a takeaway strip and a three-entry footer */
+.fields--tight {
+  gap: 20px 30px;
+}
+
+.fields--tight .fields__item {
+  padding: 22px 30px;
 }
 
 .fields__item svg {
@@ -3064,7 +3058,7 @@ a {
 }
 
 .roi__slider {
-  padding: 16px 0 18px;
+  padding: 14px 0 16px;
   border-top: 1px solid var(--rule-2);
 }
 
@@ -3670,7 +3664,7 @@ a {
 }
 
 .prec__card {
-  padding: 36px 40px 40px;
+  padding: 28px 40px 30px;
 }
 
 .prec__name {
@@ -3739,11 +3733,11 @@ a {
   font-weight: 600;
   font-size: 30px;
   width: 460px;
-  padding: 14px 24px 14px 0;
+  padding: 10px 24px 10px 0;
 }
 
 .kpi--assume td {
-  padding: 14px 24px 14px 0;
+  padding: 10px 24px 10px 0;
   font-size: 29px;
 }
 
@@ -3885,52 +3879,6 @@ a {
   margin-top: 4px;
 }
 
-/* ---------- References ---------- */
-.srcs {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 20px 56px;
-}
-
-.srcs--two {
-  grid-template-columns: 1fr 1fr;
-  gap: 16px 56px;
-}
-
-.srcs li {
-  border-top: 1px solid var(--rule-2);
-  padding-top: 14px;
-}
-
-.srcs__cite {
-  margin: 0;
-  font-size: 27px;
-  line-height: 1.3;
-  font-weight: 600;
-}
-
-.srcs--two .srcs__cite {
-  font-size: 22px;
-}
-
-.srcs__cite a {
-  text-decoration-color: var(--cherry);
-  text-underline-offset: 4px;
-}
-
-.srcs__used {
-  margin: 4px 0 0;
-  font-size: 23px;
-  line-height: 1.3;
-  color: var(--ink-2);
-}
-
-.srcs--two .srcs__used {
-  font-size: 20px;
-}
-
 /* ---------- Q&A ---------- */
 .qa {
   display: grid;
@@ -4004,6 +3952,14 @@ a {
   padding: 46px 72px 40px;
   display: flex;
   flex-direction: column;
+}
+
+/* Same spot as the address in every slide footer */
+.qa__site {
+  position: absolute;
+  right: 72px;
+  bottom: 28px;
+  color: var(--ink-2);
 }
 
 .qa__panel-head {
@@ -4094,25 +4050,7 @@ a {
   line-height: 1.36;
 }
 
-/* Header row: rubric section at left, presenter at right */
-.slide__meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.slide__meta .sec {
-  margin: 0;
-}
-
-/* Presenter in the control bar, overview and notes */
-.bar__who {
-  margin-left: 10px;
-  color: var(--gold);
-  font-weight: 600;
-}
-
+/* Presenter in the overview and the speaker notes (presenter tools only) */
 .overview__sec span {
   margin-left: 8px;
   color: var(--on-dark-2);

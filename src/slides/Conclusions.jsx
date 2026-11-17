@@ -1,4 +1,4 @@
-import { Icon, QR, Slide, Src } from "../ui/primitives.jsx";
+import { Icon, QR, Slide } from "../ui/primitives.jsx";
 import { Cols, Strip } from "../ui/layout.jsx";
 
 /* ---------- Expected outcomes ---------- */
@@ -12,7 +12,7 @@ const KPIS = [
 
 export function OutcomesSlide() {
   return (
-    <Slide title="What success looks like after 12 months" sources={<Src>Team targets. Survey design follows Urban and Sultan 2015.</Src>}>
+    <Slide title="What success looks like after 12 months">
       <table className="kpi">
         <thead>
           <tr>
@@ -44,10 +44,7 @@ const BRAND = [
 
 export function BrandSlide() {
   return (
-    <Slide
-      title="The brand finally travels with the coffee"
-      sources={<Src>Case (end consumers rarely know the coffee is Coda’s; the stores mainly help the brand). Sleeve is a mock-up.</Src>}
-    >
+    <Slide title="The brand finally travels with the coffee">
       <div className="sleeve" role="img" aria-label="Mock-up of a cup sleeve: a QR code, the words Scan to meet the grower, a lot number, Roasted by Coda Coffee, and a space for the cafe’s name">
         <span className="sleeve__qr">
           <QR size={172} quiet={2} title="" />
@@ -78,7 +75,7 @@ const GAINS = [
 
 export function GainsSlide() {
   return (
-    <Slide title="Who gains" sources={<Src>Case; Fairtrade 2023.</Src>}>
+    <Slide title="Who gains">
       <Cols items={GAINS} n={4} className="cols--tight" />
       <Strip icon="globe">
         <strong>The wider effect:</strong> growers keep about 1% of a cafe cup’s price. Cup2Farm adds recognition,
@@ -97,7 +94,7 @@ const ROAD = [
 
 export function RoadmapSlide() {
   return (
-    <Slide title="Now, next, later" sources={<Src>Case (lending and token ideas from Bext360).</Src>}>
+    <Slide title="Now, next, later">
       <Cols items={ROAD} className="cols--big" />
       <Strip icon="loop">Engagement comes from new lots, replies and harvests. Not from points.</Strip>
     </Slide>
