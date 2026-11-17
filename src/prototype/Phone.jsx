@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Icon, QR, Receipt, Stamp } from "../ui/primitives.jsx";
 import { GROWER, JOURNEY, LOT, QUICK_NOTES, TIPS } from "./data.js";
 
@@ -10,14 +10,75 @@ const TABS = [
 
 const tabFor = (screen) => (screen === "scan" ? "scan" : screen === "passport" ? "passport" : "cup");
 
-/* The app prototype. `screen` is controlled by the slide so the side panel can follow along. */
-export default function Phone({ screen, onScreen }) {
-  const [open, setOpen] = useState(0);
+const calmMotion = () => {
+  try {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  } catch {
+    return true;
+  }
+};
+
+/* The journey on the cup screen. `openStep` is the step the slide wants open; a tap opens another. */
+function Journey({ openStep, scroller }) {
+  const [open, setOpen] = useState(openStep);
+  const list = useRef(null);
+
+  // Bring the step the slide asked for into view inside the phone. The stage is scaled with a
+  // CSS transform, so on-screen boxes are converted back to the phone's own pixels.
+  useEffect(() => {
+    const box = scroller.current;
+    const row = list.current ? list.current.children[openStep] : null;
+    if (!box || typeof box.scrollTo !== "function") return;
+    let top = 0;
+    if (row && openStep > 0) {
+      const outer = box.getBoundingClientRect();
+      const inner = row.getBoundingClientRect();
+      const scale = box.offsetHeight ? outer.height / box.offsetHeight : 1;
+      const rowTop = (inner.top - outer.top) / scale + box.scrollTop;
+      top = Math.max(0, rowTop - (box.clientHeight - inner.height / scale) / 2);
+    }
+    box.scrollTo({ top, behavior: calmMotion() ? "auto" : "smooth" });
+  }, [openStep, scroller]);
+
+  return (
+    <ol className="ph-journey" ref={list}>
+      {JOURNEY.map((j, i) => (
+        <li key={j.step} className={`ph-step ${open === i ? "is-open" : ""}`}>
+          <button className="ph-step__btn" onClick={() => setOpen(open === i ? -1 : i)} aria-expanded={open === i}>
+            <span className={`ph-step__dot ph-step__dot--${j.status}`}>
+              <Icon name={j.status === "ledger" ? "check" : "info"} />
+            </span>
+            <span className="ph-step__name">{j.step}</span>
+            <span className="ph-step__date">{j.date}</span>
+          </button>
+          {open === i && (
+            <div className="ph-step__more">
+              <p>{j.detail}</p>
+              <p className="ph-step__rec">
+                {j.status === "ledger" ? "Ledger record " : "Not yet on the ledger: "}
+                <span className="mono">{j.record}</span>
+              </p>
+            </div>
+          )}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/**
+ * The app prototype. The slide controls it: `screen` is the screen showing, `openStep` the
+ * journey step open on the cup screen, and `onScreen` reports a tap that leads to another
+ * screen. Notes, tips and ratings typed into the phone stay inside it.
+ */
+export default function Phone({ screen, onScreen, openStep = 0 }) {
+  const body = useRef(null);
   const [note, setNote] = useState(QUICK_NOTES[0]);
   const [custom, setCustom] = useState("");
   const [tip, setTip] = useState(0);
   const [rating, setRating] = useState(0);
-  const [sent, setSent] = useState(false);
+  // Arriving on the last screens from the next slide still shows a sent thank-you.
+  const [sent, setSent] = useState(() => screen === "sent" || screen === "passport");
   const [sentTip, setSentTip] = useState(0);
   const [email, setEmail] = useState("");
   const [emailSaved, setEmailSaved] = useState(false);
@@ -25,11 +86,14 @@ export default function Phone({ screen, onScreen }) {
   const verified = JOURNEY.filter((j) => j.status === "ledger").length;
   const message = custom.trim() || note;
 
-  const send = () => {
+  // The thank-you is sent when the delivered screen opens, whether the arrow key or the
+  // Send button led there. Runs before paint, so the screen never shows a stale tip.
+  useLayoutEffect(() => {
+    if (screen !== "sent") return;
     setSent(true);
     setSentTip(tip);
-    onScreen("sent");
-  };
+    // Keyed on the screen alone: only the arrival sends. A tip changed later waits for the next send.
+  }, [screen]);
 
   return (
     <div className="phone" data-noswipe>
@@ -40,7 +104,7 @@ export default function Phone({ screen, onScreen }) {
           <span>cup2farm.coda</span>
         </div>
 
-        <div className="ph-body" key={screen}>
+        <div className="ph-body" key={screen} ref={body}>
           {screen === "scan" && (
             <div className="ph-scan">
               <p className="ph-eyebrow">Cup2Farm by Coda Coffee</p>
@@ -88,28 +152,7 @@ export default function Phone({ screen, onScreen }) {
                 </div>
               </div>
               <h4 className="ph-h2">The journey</h4>
-              <ol className="ph-journey">
-                {JOURNEY.map((j, i) => (
-                  <li key={j.step} className={`ph-step ${open === i ? "is-open" : ""}`}>
-                    <button className="ph-step__btn" onClick={() => setOpen(open === i ? -1 : i)} aria-expanded={open === i}>
-                      <span className={`ph-step__dot ph-step__dot--${j.status}`}>
-                        <Icon name={j.status === "ledger" ? "check" : "info"} />
-                      </span>
-                      <span className="ph-step__name">{j.step}</span>
-                      <span className="ph-step__date">{j.date}</span>
-                    </button>
-                    {open === i && (
-                      <div className="ph-step__more">
-                        <p>{j.detail}</p>
-                        <p className="ph-step__rec">
-                          {j.status === "ledger" ? "Ledger record " : "Not yet on the ledger: "}
-                          <span className="mono">{j.record}</span>
-                        </p>
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ol>
+              <Journey key={openStep} openStep={openStep} scroller={body} />
               <div className="ph-actions">
                 <button className="ph-btn" onClick={() => onScreen("grower")}>
                   Meet the growers
@@ -219,7 +262,7 @@ export default function Phone({ screen, onScreen }) {
               </div>
 
               <div className="ph-actions ph-actions--one">
-                <button className="ph-btn ph-btn--primary" onClick={send}>
+                <button className="ph-btn ph-btn--primary" onClick={() => onScreen("sent")}>
                   Send thanks{tip > 0 ? ` and $${tip}` : ""}
                 </button>
               </div>

@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
-import { Icon, Slide, Src } from "../ui/primitives.jsx";
+import { useEffect, useMemo, useState } from "react";
+import { Icon, Slide, useStep } from "../ui/primitives.jsx";
 import { Cols, Strip } from "../ui/layout.jsx";
-import { PRESETS, count, money, roi } from "../model/roi.js";
+import { ASSUMPTIONS, PRESETS, count, money, roi } from "../model/roi.js";
 
 /* ---------- Evidence: before and after a benevolent app ---------- */
 const EVIDENCE = [
@@ -36,10 +36,7 @@ function Dumbbell({ row }) {
 
 export function EvidenceSlide() {
   return (
-    <Slide
-      title="Benevolent apps lift trust first, then sales potential"
-      sources={<Src>Urban and Sultan 2015. Liberty Mutual study of 750 consumers; Suruga Bank study of 1,500.</Src>}
-    >
+    <Slide title="Benevolent apps lift trust first, then sales potential">
       <div className="evi">
         <div className="evi__chart">
           <ul className="evi__legend">
@@ -72,8 +69,12 @@ const SLIDERS = [
   { key: "accounts", label: "Wholesale accounts won or kept", min: 0, max: 40, step: 1, show: (v) => `${v}` },
 ];
 
+// The arrow walks the three phases in order. The sliders stay free: move one and the phase
+// buttons clear, press the arrow (or a phase) and the model snaps back to that phase.
 export function RoiSlide() {
-  const [input, setInput] = useState(PRESETS[1]);
+  const [step, setStep] = useStep();
+  const [input, setInput] = useState(PRESETS[step] ?? PRESETS[0]);
+  useEffect(() => setInput(PRESETS[step] ?? PRESETS[0]), [step]);
   const r = useMemo(() => roi(input), [input]);
   const matched = PRESETS.find((p) => SLIDERS.every((s) => p[s.key] === input[s.key]) && p.cost === input.cost);
   const pct = Math.min(100, (r.perDollar / 2) * 100);
@@ -83,12 +84,20 @@ export function RoiSlide() {
       : `Break-even needs ${r.accountsToBreakEven} wholesale accounts, or more reach.`;
 
   return (
-    <Slide title="ROI builds with reach" sources={<Src>Team model; assumptions are listed in the references. Urban and Sultan 2015; ConsumerAffairs 2025; codacoffee.com.</Src>}>
+    <Slide title="ROI builds with reach">
       <div className="roi" data-noswipe>
         <div className="roi__in">
           <div className="roi__presets" role="group" aria-label="Scenario">
-            {PRESETS.map((p) => (
-              <button key={p.id} className={`roi__preset ${matched && matched.id === p.id ? "is-on" : ""}`} onClick={() => setInput(p)} aria-pressed={!!matched && matched.id === p.id}>
+            {PRESETS.map((p, i) => (
+              <button
+                key={p.id}
+                className={`roi__preset ${matched && matched.id === p.id ? "is-on" : ""}`}
+                onClick={() => {
+                  setStep(i);
+                  setInput(p);
+                }}
+                aria-pressed={!!matched && matched.id === p.id}
+              >
                 {p.label}
               </button>
             ))}
@@ -151,6 +160,46 @@ export function RoiSlide() {
     </Slide>
   );
 }
+RoiSlide.steps = PRESETS.length;
+
+/* ---------- Model assumptions ---------- */
+export function AssumptionsSlide() {
+  const a = ASSUMPTIONS;
+  // Lowest and highest value of one scenario input across the phases, e.g. "2 to 3%".
+  const span = (pick, show, unit = "") => {
+    const xs = PRESETS.map(pick);
+    const lo = show(Math.min(...xs));
+    const hi = show(Math.max(...xs));
+    return lo === hi ? `${lo}${unit}` : `${lo} to ${hi}${unit}`;
+  };
+  const pct = (x) => `${Math.round(x * 100)}`;
+  const rows = [
+    ["Coffee carrying the code", `${span((p) => p.pounds, count)} lb a year`, "scenario; below the 500K lb of 2013 (Peterson, 2013)"],
+    ["Scan rate, thank rate", `${span((p) => p.scanRate, pct, "%")}, ${span((p) => p.thankRate, pct, "%")}`, "scenario; the pilot measures both"],
+    ["Cups per pound of coffee", `${a.cupsPerPound}`, "12 oz cups at 20 g each (James, 2025)"],
+    ["Scans per scanning drinker", `${a.scansPerPerson} a year`, "team estimate"],
+    ["Profit per engaged drinker", `${money(a.profitPerDrinker)} a year`, "about $150 in bags and visits at 40% margin"],
+    ["Lift in sales potential", `${Math.round(a.researchLift * 100)}%`, "Urban & Sultan (2015)"],
+    ["Lift that carries over", `${Math.round(a.liftTransfer * 100)}%`, "team estimate; the study required app use"],
+    ["Profit per wholesale account", `${money(a.profitPerAccount)} a year`, "about 60 lb a week at $2 a pound of margin"],
+    ["Program cost", `${span((p) => p.cost, (x) => `$${count(x)}`)} a year`, "team estimate by phase"],
+  ];
+  return (
+    <Slide title="Model assumptions">
+      <table className="kpi kpi--assume">
+        <tbody>
+          {rows.map(([name, value, basis]) => (
+            <tr key={name}>
+              <th scope="row">{name}</th>
+              <td>{value}</td>
+              <td>{basis}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Slide>
+  );
+}
 
 /* ---------- Reach ---------- */
 const REACH = [
@@ -161,7 +210,7 @@ const REACH = [
 
 export function ReachSlide() {
   return (
-    <Slide title="How it reaches people" sources={<Src>Case.</Src>}>
+    <Slide title="How it reaches people">
       <Cols items={REACH} />
       <Strip icon="cup">
         <strong>The cup is the channel.</strong> Reach grows with every partner that pours Coda.
@@ -176,10 +225,7 @@ const INNOV = ["Proof of payment, farmer by farmer", "A channel that runs both w
 
 export function InnovationSlide() {
   return (
-    <Slide
-      title="Tracing is becoming infrastructure. The return path is the innovation."
-      sources={<Src>Tea and Coffee Trade Journal 2020; EUDR; Case.</Src>}
-    >
+    <Slide title="Tracing is becoming infrastructure. The return path is the innovation.">
       <div className="duo">
         <div className="duo__col duo__col--quiet">
           <h3 className="duo__head">A code and a trace page</h3>
@@ -224,11 +270,11 @@ const TESTS = [
 ];
 
 export function ScorecardSlide() {
-  const [sel, setSel] = useState(3);
+  const [sel, setSel] = useStep();
   const avg = TESTS.reduce((a, t) => a + t.score, 0) / TESTS.length;
   const t = TESTS[sel];
   return (
-    <Slide title="Will the data advantage last? Seven tests" sources={<Src>Hagiu and Wright 2020 (the seven questions); scores are the team’s assessment.</Src>}>
+    <Slide title="Will the data advantage last? Seven tests">
       <div className="score" data-noswipe>
         <ol className="score__list">
           {TESTS.map((x, i) => (
@@ -258,3 +304,4 @@ export function ScorecardSlide() {
     </Slide>
   );
 }
+ScorecardSlide.steps = TESTS.length;

@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Icon, Slide, Src, Tag } from "../ui/primitives.jsx";
+import { Icon, Slide, Tag, useStep } from "../ui/primitives.jsx";
 import { Rows, Strip } from "../ui/layout.jsx";
 
 /* ---------- How it works ---------- */
@@ -39,11 +38,14 @@ const RETURN_PATH = {
   tech: ["New", "Translation", "Mobile money"],
 };
 
+// The arrow walks the six nodes left to right; the last press shows the return path.
+const RETURN_STEP = FLOW.length;
+
 export function FlowSlide() {
-  const [sel, setSel] = useState(1);
-  const node = sel === 6 ? RETURN_PATH : FLOW[sel];
+  const [sel, setSel] = useStep();
+  const node = sel === RETURN_STEP ? RETURN_PATH : FLOW[sel];
   return (
-    <Slide title="How it works: one ledger, two directions" sources={<Src>Case; Bext360; Freethink.</Src>}>
+    <Slide title="How it works: one ledger, two directions">
       <div className="flow" data-noswipe>
         <div className="chain chain--6" role="group" aria-label="System flow">
           {FLOW.map((c, i) => (
@@ -64,7 +66,7 @@ export function FlowSlide() {
             </defs>
             <path d="M 1334 4 V 40 H 122 V 12" fill="none" stroke="#c5162e" strokeWidth="5" strokeLinejoin="round" markerEnd="url(#flow-back)" />
           </svg>
-          <button className={`flow__pill ${sel === 6 ? "is-on" : ""}`} onClick={() => setSel(6)} aria-pressed={sel === 6}>
+          <button className={`flow__pill ${sel === RETURN_STEP ? "is-on" : ""}`} onClick={() => setSel(RETURN_STEP)} aria-pressed={sel === RETURN_STEP}>
             <Icon name="heart" /> Return path: thanks, tips, feedback
           </button>
         </div>
@@ -85,6 +87,7 @@ export function FlowSlide() {
     </Slide>
   );
 }
+FlowSlide.steps = FLOW.length + 1;
 
 /* ---------- Two technology choices ---------- */
 const WEB = ["Opens from a scan, with nothing to install", "No app-store fees or gatekeepers in between", "Replies can still arrive as notifications"];
@@ -92,7 +95,7 @@ const AI = ["Grading cherries at origin, where it already works", "Translating n
 
 export function TechChoicesSlide() {
   return (
-    <Slide title="Two technology choices" sources={<Src>Lecture (data islands; AI washing; augment, not replace); WebKit 2023; Case.</Src>}>
+    <Slide title="Two technology choices">
       <div className="duo">
         <div className="duo__col">
           <h3 className="duo__head">Web app, not native app</h3>
@@ -135,7 +138,7 @@ const CHANGES = [
 
 export function InsideCodaSlide() {
   return (
-    <Slide title="What changes inside Coda" sources={<Src>Case (license fee of 1 to 2% of the wholesale bean price; data-access questions).</Src>}>
+    <Slide title="What changes inside Coda">
       <Rows items={CHANGES} n={2} />
       <Strip icon="coin">
         <strong>One cost to plan for:</strong> Bext360’s platform fee, 1 to 2% of the wholesale bean price.
@@ -154,7 +157,7 @@ const PHASES = [
 
 export function RolloutSlide() {
   return (
-    <Slide title="Start in Coda’s own cafes, then earn the wider launch" sources={<Src>Urban and Sultan 2015 (five steps for benevolent apps); Case (retail stores as a test lab).</Src>}>
+    <Slide title="Start in Coda’s own cafes, then earn the wider launch">
       <ol className="phases">
         {PHASES.map((p, i) => (
           <li key={p.name} className="phases__item">
@@ -221,10 +224,11 @@ const RISKS = [
   },
 ];
 
+// One group of risks per press.
 export function RisksSlide() {
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useStep();
   return (
-    <Slide title="Data risks, and how we handle them" sources={<Src>Case (data access, marker technology); Lecture (data ownership, honest visualization).</Src>}>
+    <Slide title="Data risks, and how we handle them">
       <div className="risks" data-noswipe>
         <div className="risks__tabs" role="group" aria-label="Type of risk">
           {RISKS.map((r, i) => (
@@ -251,6 +255,7 @@ export function RisksSlide() {
     </Slide>
   );
 }
+RisksSlide.steps = RISKS.length;
 
 /* ---------- Competitive landscape ---------- */
 const SHIFT = [
@@ -261,7 +266,7 @@ const SHIFT = [
 
 export function LandscapeSlide() {
   return (
-    <Slide title="It changes what Coda sells to a cafe, not only to a drinker" sources={<Src>Case; team analysis.</Src>}>
+    <Slide title="It changes what Coda sells to a cafe, not only to a drinker">
       <table className="shift">
         <thead>
           <tr>
@@ -287,7 +292,7 @@ export function LandscapeSlide() {
 /* ---------- Precedents ---------- */
 export function PrecedentsSlide() {
   return (
-    <Slide title="Two precedents, one lesson" sources={<Src>Tea and Coffee Trade Journal 2020; CoinDesk 2020; GGBa 2025.</Src>}>
+    <Slide title="Two precedents, one lesson">
       <div className="prec">
         <div className="prec__card card">
           <Tag tone="sea">2020</Tag>
@@ -319,8 +324,8 @@ const PARTNERS = [
 
 export function PartnersSlide() {
   return (
-    <Slide title="Partners that make it work" sources={<Src>Case; PFG 2022; Bext360.</Src>}>
-      <div className="fields">
+    <Slide title="Partners that make it work">
+      <div className="fields fields--tight">
         {PARTNERS.map((f) => (
           <div className="fields__item" key={f.head}>
             <Icon name={f.icon} />

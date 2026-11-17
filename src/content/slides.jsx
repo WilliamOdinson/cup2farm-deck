@@ -15,7 +15,7 @@ import { DoesDoesntSlide, ExistsNewSlide, IdeaSlide, SpectrumSlide, TrustSlide }
 import { PrototypeSlide } from "../slides/PrototypeSlide.jsx";
 import { DataSourcesSlide, LearnSlide, SixFieldsSlide } from "../slides/Data.jsx";
 import { FrictionSlide, MotiveSlide, ReturnSlide } from "../slides/Adoption.jsx";
-import { EvidenceSlide, InnovationSlide, ReachSlide, RoiSlide, ScorecardSlide } from "../slides/Roi.jsx";
+import { AssumptionsSlide, EvidenceSlide, InnovationSlide, ReachSlide, RoiSlide, ScorecardSlide } from "../slides/Roi.jsx";
 import {
   FlowSlide,
   InsideCodaSlide,
@@ -27,7 +27,7 @@ import {
   TechChoicesSlide,
 } from "../slides/TechMgmt.jsx";
 import { BrandSlide, BriefSlide, GainsSlide, OutcomesSlide, RoadmapSlide } from "../slides/Conclusions.jsx";
-import { AssumptionsSlide, QASlide, SourcesCompanySlide, SourcesCourseSlide, SourcesMarketSlide } from "../slides/Appendix.jsx";
+import { QASlide } from "../slides/QA.jsx";
 
 const COMPONENTS = {
   cup2farm: TitleSlide,
@@ -57,6 +57,7 @@ const COMPONENTS = {
   return: ReturnSlide,
   evidence: EvidenceSlide,
   roi: RoiSlide,
+  assumptions: AssumptionsSlide,
   reach: ReachSlide,
   innovation: InnovationSlide,
   scorecard: ScorecardSlide,
@@ -73,16 +74,24 @@ const COMPONENTS = {
   "who-gains": GainsSlide,
   roadmap: RoadmapSlide,
   brief: BriefSlide,
-  "sources-course": SourcesCourseSlide,
-  "sources-market": SourcesMarketSlide,
-  "sources-company": SourcesCompanySlide,
-  assumptions: AssumptionsSlide,
   qa: QASlide,
 };
 
+// `steps` is how many states the right arrow walks through before leaving the slide.
+// A component declares it as a static property (TimelineSlide.steps = 7); the default is 1.
 export const SLIDES = OUTLINE.map((o) => {
   const Component = COMPONENTS[o.id];
   if (!Component) throw new Error(`No slide component registered for "${o.id}"`);
   const part = partOf(o);
-  return { ...o, Component, partLabel: part.label, presenter: part.presenter, section: sectionOf(o) };
+  const steps = Number.isInteger(Component.steps) && Component.steps > 0 ? Component.steps : 1;
+  return {
+    ...o,
+    Component,
+    steps,
+    refs: o.refs || [],
+    footnote: o.footnote || "",
+    partLabel: part.label,
+    presenter: part.presenter,
+    section: sectionOf(o),
+  };
 });

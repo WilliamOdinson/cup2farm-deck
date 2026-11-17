@@ -1,133 +1,111 @@
-// Every figure in the deck traces to one of these. `cite` is the reference,
-// `used` is what the deck takes from it. Web sources were retrieved in November 2026.
-export const SOURCES = [
-  {
-    id: "course",
-    group: "Course materials",
-    items: [
-      {
-        cite: "Youngdahl and Hunsaker (2018). Coda Coffee and Bext360 Supply Chain. Thunderbird case A09-18-0012.",
-        used: "Company history, wholesale share, Farm2Cup, the Bext360 pilot, license fee.",
-      },
-      {
-        cite: "Urban and Sultan (2015). The Case for ‘Benevolent’ Mobile Apps. MIT Sloan Management Review.",
-        used: "Benevolence spectrum, three factors of trust, Liberty Mutual and Suruga Bank results, five steps.",
-      },
-      {
-        cite: "Hagiu and Wright (2020). When Data Creates Competitive Advantage. Harvard Business Review.",
-        used: "The seven questions for a lasting data advantage.",
-      },
-      {
-        cite: "Riel (2026). 95-722 Digital Transformation: Data Adoption, lecture and appendices. Carnegie Mellon University.",
-        used: "Algorithmic experience wheel, types of analytics, data islands, AI washing, trust and value.",
-      },
-      {
-        cite: "Freethink, Coded series. How AI could revolutionize coffee.",
-        used: "How the bextmachine works at origin.",
-        url: "https://www.freethink.com/series/coded/how-ai-could-revolutionize-coffee",
-      },
-    ],
+// References in APA 7 style, shown in the footer of the slides that use them.
+// Which slide cites which reference is set in outline.js (`refs`).
+//
+// `text` is the reference without its URL; *asterisks* mark what APA sets in italics.
+// `url` is appended as a link. Web sources were retrieved in November 2026.
+export const REFS = {
+  /* Course materials */
+  case: {
+    text: "Youngdahl, W. E., & Hunsaker, B. T. (2018). *Coda Coffee and Bext360 supply chain: Machine vision, AI, IoT, and blockchain* (Case No. A09-18-0012). Thunderbird School of Global Management.",
   },
-  {
-    id: "market",
-    group: "Market and consumer data",
-    items: [
-      {
-        cite: "National Coffee Association. National Coffee Data Trends, Fall 2026 (via Beverage Industry).",
-        used: "48% of US adults drank specialty coffee yesterday, a record.",
-        url: "https://www.bevindustry.com/articles/98686-coffee-tops-beverage-charts-again-specialty-coffee-hits-new-high",
-      },
-      {
-        cite: "StoneX Coffee Network (2026). Retail prices stay elevated as futures fall.",
-        used: "US retail ground coffee at a record $9.72 a pound, April 2026.",
-        url: "https://www.stonex.com/en-us/insights/retail-prices-stay-elevated-as-futures-fall-exposing-a-deepening-disconnect-in-the-coffee-market/",
-      },
-      {
-        cite: "Fairtrade International (2023). Realistic and fair prices for coffee farmers.",
-        used: "Producers keep about 1% of the retail price of a cup.",
-        url: "https://www.fairtrade.net/en/get-involved/news/realistic-and-fair-prices-for-coffee-farmers-are-a-non-negotiabl.html",
-      },
-      {
-        cite: "Uniqode (2026). The State of QR Codes 2026: how consumers actually scan.",
-        used: "70% of 1,000 US consumers surveyed scan at least monthly; restaurants are the top place.",
-        url: "https://www.uniqode.com/unique-angles/playbooks/state-of-qr-codes-2026/consumer-behaviour",
-      },
-      {
-        cite: "PwC (2024). Voice of the Consumer Survey.",
-        used: "A stated 9.7% premium for sustainably sourced goods.",
-        url: "https://www.pwc.com/gx/en/news-room/press-releases/2024/pwc-2024-voice-of-consumer-survey.html",
-      },
-      {
-        cite: "Edelman Trust Barometer Special Report 2025 (Richard Edelman in The Drum).",
-        used: "Trust now ranks with price and quality in purchase decisions.",
-        url: "https://www.thedrum.com/news/2025/06/19/richard-edelman-brands-must-become-the-optimists-consumers-can-t-afford-be",
-      },
-      {
-        cite: "AppsFlyer via Business of Apps 2026 (cited by Braze).",
-        used: "Day-30 retention for food and drink apps: 3.6% iOS, 2.9% Android.",
-        url: "https://www.braze.com/resources/articles/mobile-app-retention",
-      },
-      {
-        cite: "EY Tax News (2026). EU Deforestation Regulation application postponed to 30 December 2026.",
-        used: "Plot-level geolocation becomes mandatory for coffee sold in the EU.",
-        url: "https://taxnews.ey.com/news/2026-0237-eu-deforestation-regulation-application-postponed-to-30-december-2026",
-      },
-      {
-        cite: "ConsumerAffairs (2025). Coffee hasn’t been this expensive in decades.",
-        used: "About 22 twelve-ounce cups per pound at 20 g a cup.",
-        url: "https://www.consumeraffairs.com/news/coffee-hasnt-been-this-expensive-in-decades-and-your-receipt-is-proving-it-121825.html",
-      },
-    ],
+  urban: {
+    text: "Urban, G. L., & Sultan, F. (2015). The case for ‘benevolent’ mobile apps. *MIT Sloan Management Review, 56*(2), 31–37.",
   },
-  {
-    id: "company",
-    group: "Company and precedents",
-    items: [
-      {
-        cite: "Coda Coffee Company website (2026).",
-        used: "Wholesale reach; bag prices from $17.",
-        url: "https://www.codacoffee.com/wholesale",
-      },
-      {
-        cite: "Confluence Denver (2013). “Roaster of the Year” Coda Coffee grows to 40 employees.",
-        used: "Coda roasted about 500,000 lb a year in 2013.",
-        url: "https://www.confluence-denver.com/innovationnews/coda_coffee_110713.aspx",
-      },
-      {
-        cite: "Performance Food Group press release (2022).",
-        used: "Coda joined PFG in 2020; roasteries in Denver and Glendale, Arizona.",
-        url: "https://www.theglobeandmail.com/investing/markets/stocks/PFGC/pressreleases/9373382/",
-      },
-      {
-        cite: "Fibre2Fashion (2018) and Tracxn (2026) on Bext360.",
-        used: "Licensed platform; data access for retailers and wholesalers.",
-        url: "https://www.fibre2fashion.com/news/textile-news/bext360-closes-seed-funding-expands-into-new-verticals-242600-newsdetails.htm",
-      },
-      {
-        cite: "Tea and Coffee Trade Journal (2020). New Starbucks traceability tool.",
-        used: "Starbucks Digital Traceability for bags of whole-bean coffee.",
-        url: "https://www.teaandcoffee.net/news/25271/new-starbucks-traceability-tool-explores-bean-to-cup-journey/",
-      },
-      {
-        cite: "Restaurant Dive (2026). Starbucks fiscal Q3 2026 results.",
-        used: "35.8 million active US Rewards members.",
-        url: "https://www.restaurantdive.com/news/starbucks-experience-refinements-turning-engagement-into-rituals/826655/",
-      },
-      {
-        cite: "CoinDesk (2020). IBM blockchain app for sustainable coffee.",
-        used: "Thank My Farmer, launched by IBM and Farmer Connect.",
-        url: "https://www.coindesk.com/ibm-blockchain-app-promotes-virtuous-cycle-for-sustainable-coffee/",
-      },
-      {
-        cite: "Greater Geneva Bern area (2025). Agridence acquires Farmer Connect.",
-        used: "Farmer Connect moved to compliance software and was acquired.",
-        url: "https://ggba.swiss/en/agridence-acquires-genevas-traceability-platform-farmer-connect/",
-      },
-      {
-        cite: "WebKit (2023). Web Push for Web Apps on iOS and iPadOS.",
-        used: "Web apps can send notifications once saved to the home screen.",
-        url: "https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/",
-      },
-    ],
+  hagiu: {
+    text: "Hagiu, A., & Wright, J. (2020). When data creates competitive advantage… and when it doesn’t. *Harvard Business Review, 98*(1), 94–101.",
   },
-];
+  lecture: {
+    text: "Riel, J. D. (2026). *Data adoption* [Lecture slides]. 95-722 Digital Transformation, Heinz College, Carnegie Mellon University.",
+  },
+  freethink: {
+    text: "Freethink. (2017, November 2). *How AI could revolutionize coffee* [Video].",
+    url: "https://www.freethink.com/series/coded/how-ai-could-revolutionize-coffee",
+  },
+
+  /* Market and consumer data */
+  nca: {
+    text: "Coffee tops beverage charts again, specialty coffee hits new high. (2026, September 18). *Beverage Industry*.",
+    url: "https://www.bevindustry.com/articles/98686-coffee-tops-beverage-charts-again-specialty-coffee-hits-new-high",
+  },
+  stonex: {
+    text: "Rubinstein, A. (2026, May 18). *Retail prices stay elevated as futures fall, exposing a deepening disconnect in the coffee market*. StoneX.",
+    url: "https://www.stonex.com/en-us/insights/retail-prices-stay-elevated-as-futures-fall-exposing-a-deepening-disconnect-in-the-coffee-market/",
+  },
+  fairtrade: {
+    text: "Fairtrade International. (2023, August 1). *Realistic and fair prices for coffee farmers are a non-negotiable for the future of coffee*.",
+    url: "https://www.fairtrade.net/en/get-involved/news/realistic-and-fair-prices-for-coffee-farmers-are-a-non-negotiabl.html",
+  },
+  uniqode: {
+    text: "Uniqode. (2026). *The state of QR codes 2026: How consumers actually scan*.",
+    url: "https://www.uniqode.com/unique-angles/playbooks/state-of-qr-codes-2026/consumer-behaviour",
+  },
+  pwc: {
+    text: "PwC. (2024, May 15). *Consumers willing to pay 9.7% sustainability premium, even as cost-of-living and inflationary concerns weigh: PwC 2024 Voice of the Consumer Survey* [Press release].",
+    url: "https://www.pwc.com/gx/en/news-room/press-releases/2024/pwc-2024-voice-of-consumer-survey.html",
+  },
+  edelman: {
+    text: "Young, G. (2025, June 19). Richard Edelman: Brands must become the optimists consumers can’t afford to be. *The Drum*.",
+    url: "https://www.thedrum.com/news/2025/06/19/richard-edelman-brands-must-become-the-optimists-consumers-can-t-afford-be",
+  },
+  braze: {
+    text: "Team Braze. (2026, July 24). *App retention: How to measure, benchmark, and improve it*. Braze.",
+    url: "https://www.braze.com/resources/articles/mobile-app-retention",
+  },
+  eudr: {
+    text: "Ernst & Young. (2026, January 20). *EU Deforestation Regulation application postponed to 30 December 2026* (Tax News Update No. 2026-0237).",
+    url: "https://taxnews.ey.com/news/2026-0237-eu-deforestation-regulation-application-postponed-to-30-december-2026",
+  },
+  consumeraffairs: {
+    text: "James, K. (2025, December 18). *Coffee hasn’t been this expensive in decades, and your receipt is proving it*. ConsumerAffairs.",
+    url: "https://www.consumeraffairs.com/news/coffee-hasnt-been-this-expensive-in-decades-and-your-receipt-is-proving-it-121825.html",
+  },
+
+  /* Company and precedents */
+  codasite: {
+    text: "Coda Coffee Company. (n.d.). *Wholesale*. Retrieved November 17, 2026, from",
+    url: "https://www.codacoffee.com/wholesale",
+  },
+  confluence: {
+    text: "Peterson, E. (2013, November 7). “Roaster of the Year” Coda Coffee grows to 40 employees. *Confluence Denver*.",
+    url: "https://www.confluence-denver.com/innovationnews/coda_coffee_110713.aspx",
+  },
+  pfg: {
+    text: "Performance Food Group Company. (2022, July 28). *PFG’s Coda Coffee Co. brews up a silver at the 43rd annual Telly Awards* [Press release]. Business Wire.",
+    url: "https://www.businesswire.com/news/home/20220728005632/en/",
+  },
+  bext: {
+    text: "Fibre2Fashion News Desk. (2018, June 6). *Bext360 closes seed funding; expands into new verticals*. Fibre2Fashion.",
+    url: "https://www.fibre2fashion.com/news/textile-news/bext360-closes-seed-funding-expands-into-new-verticals-242600-newsdetails.htm",
+  },
+  starbucks: {
+    text: "New Starbucks traceability tool explores bean-to-cup journey. (2020, August 26). *Tea & Coffee Trade Journal*.",
+    url: "https://www.teaandcoffee.net/news/25271/new-starbucks-traceability-tool-explores-bean-to-cup-journey/",
+  },
+  farmerconnect: {
+    text: "IBM Blockchain teams up with Farmer Connect to provide coffee traceability. (2020, January 6). *Tea & Coffee Trade Journal*.",
+    url: "https://www.teaandcoffee.net/news/23474/ibm-blockchain-teams-up-with-farmer-connect-to-provide-coffee-traceability/",
+  },
+  rewards: {
+    text: "Wassel, B. (2026, July 30). *Starbucks’ experience refinements are ‘turning engagement into rituals,’ CEO says*. Restaurant Dive.",
+    url: "https://www.restaurantdive.com/news/starbucks-experience-refinements-turning-engagement-into-rituals/826655/",
+  },
+  agridence: {
+    text: "Greater Geneva Bern area. (2025, August 19). *Agridence acquires Geneva’s traceability platform Farmer Connect*.",
+    url: "https://ggba.swiss/en/agridence-acquires-genevas-traceability-platform-farmer-connect/",
+  },
+  webkit: {
+    text: "Eidson, B., & Simmons, J. (2023, February 16). *Web Push for web apps on iOS and iPadOS*. WebKit.",
+    url: "https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/",
+  },
+};
+
+// APA lists references alphabetically; leading quotation marks do not count.
+const sortKey = (id) => REFS[id].text.replace(/^[^A-Za-z0-9]+/, "").toLowerCase();
+
+/** The references for a list of ids, in APA order. Unknown ids throw, so a typo cannot ship. */
+export function refsFor(ids = []) {
+  for (const id of ids) {
+    if (!REFS[id]) throw new Error(`Unknown reference "${id}". Add it to REFS in src/content/sources.js.`);
+  }
+  return [...ids].sort((a, b) => sortKey(a).localeCompare(sortKey(b))).map((id) => ({ id, ...REFS[id] }));
+}

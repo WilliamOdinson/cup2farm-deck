@@ -11,6 +11,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "build:standalone": "node scripts/build-standalone.mjs",
+    "gen:qr": "node scripts/gen-qr.mjs",
     "test": "node --test",
     "check:layout": "node scripts/check-layout.mjs",
     "shots": "node scripts/shots.mjs"

@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Cup, Icon, Slide, Src } from "../ui/primitives.jsx";
+import { Cup, Icon, Slide, useStep } from "../ui/primitives.jsx";
 import { Cols, Rows, Stat, Strip } from "../ui/layout.jsx";
 
 /* ---------- What Coda stands for ---------- */
@@ -12,7 +11,7 @@ const COMMITMENTS = [
 
 export function StandsForSlide() {
   return (
-    <Slide title="Coda stands for coffee that does good" sources={<Src>Case.</Src>}>
+    <Slide title="Coda stands for coffee that does good">
       <Rows items={COMMITMENTS} n={2} />
       <Strip icon="lock">
         <strong>Our guardrails:</strong> farmer premiums stay untouched, quality comes first, and trust is never traded
@@ -61,14 +60,12 @@ const TIMELINE = [
   },
 ];
 
+// One stop per press of the right arrow, from the founding to today.
 export function TimelineSlide() {
-  const [sel, setSel] = useState(4);
+  const [sel, setSel] = useStep();
   const item = TIMELINE[sel];
   return (
-    <Slide
-      title="Fifteen years of doing good, then proving it"
-      sources={<Src>Case; PFG 2022 (2020 acquisition); codacoffee.com.</Src>}
-    >
+    <Slide title="Fifteen years of doing good, then proving it">
       <div className="tl" role="group" aria-label="Coda Coffee timeline" data-noswipe>
         {TIMELINE.map((t, i) => (
           <button key={t.y} aria-pressed={i === sel} className={`tl__stop ${i === sel ? "is-on" : ""}`} onClick={() => setSel(i)}>
@@ -88,6 +85,7 @@ export function TimelineSlide() {
     </Slide>
   );
 }
+TimelineSlide.steps = TIMELINE.length;
 
 /* ---------- Supply chain stakeholders ---------- */
 const CHAIN = [
@@ -142,11 +140,12 @@ const CHAIN = [
   },
 ];
 
+// The arrow walks the chain from the farm to the cup, so the walk ends on the drinker.
 export function ChainSlide() {
-  const [sel, setSel] = useState(6);
+  const [sel, setSel] = useStep();
   const node = CHAIN[sel];
   return (
-    <Slide title="Seven hands touch the coffee. Only the last never hears the story." sources={<Src>Case.</Src>}>
+    <Slide title="Seven hands touch the coffee. Only the last never hears the story.">
       <div className="chain" role="group" aria-label="Coffee supply chain" data-noswipe>
         {CHAIN.map((c, i) => (
           <button
@@ -185,6 +184,7 @@ export function ChainSlide() {
     </Slide>
   );
 }
+ChainSlide.steps = CHAIN.length;
 
 /* ---------- Competitors ---------- */
 const RIVALS = [
@@ -210,10 +210,7 @@ const RIVALS = [
 
 export function RivalsSlide() {
   return (
-    <Slide
-      title="Everyone tells an origin story. Almost no one shows the receipt."
-      sources={<Src>Case; Restaurant Dive 2026 (Starbucks Rewards).</Src>}
-    >
+    <Slide title="Everyone tells an origin story. Almost no one shows the receipt.">
       <Cols items={RIVALS} />
     </Slide>
   );
@@ -222,7 +219,7 @@ export function RivalsSlide() {
 /* ---------- Trends ---------- */
 export function TrendsASlide() {
   return (
-    <Slide title="People drink better coffee, and pay more for it" sources={<Src>NCA 2026; StoneX 2026; Fairtrade 2023.</Src>}>
+    <Slide title="People drink better coffee, and pay more for it">
       <div className="stats">
         <Stat
           theme="Specialty is mainstream"
@@ -243,7 +240,7 @@ export function TrendsASlide() {
 
 export function TrendsBSlide() {
   return (
-    <Slide title="They already scan, and they buy on trust" sources={<Src>Uniqode 2026; PwC 2024; Edelman 2025.</Src>}>
+    <Slide title="They already scan, and they buy on trust">
       <div className="stats">
         <Stat
           theme="Scanning is a habit"
@@ -264,7 +261,7 @@ export function TrendsBSlide() {
 
 export function SoWhatSlide() {
   return (
-    <Slide variant="stage" hideHead sources={<Src>EUDR; Lecture (the age of algorithms).</Src>}>
+    <Slide variant="stage" hideHead>
       <div className="sowhat">
         <p className="sowhat__big">Proof is becoming expected. Benevolence is still rare.</p>
         <div className="sowhat__rows">
@@ -285,7 +282,7 @@ export function SoWhatSlide() {
 /* ---------- Problem and opportunity ---------- */
 export function ProblemSlide() {
   return (
-    <Slide variant="stage" title="Coda earns trust at origin. It never reaches the cup." sources={<Src>Case.</Src>}>
+    <Slide variant="stage" title="Coda earns trust at origin. It never reaches the cup.">
       <div className="pb-grid">
         <div>
           <p className="pb-num">95%+</p>
@@ -314,7 +311,7 @@ const GAPS = [
 
 export function GapsSlide() {
   return (
-    <Slide title="Three gaps, one opening" sources={<Src>Case (wholesale share, retail stores, closing questions).</Src>}>
+    <Slide title="Three gaps, one opening">
       <Cols items={GAPS} />
       <Strip icon="cup">
         <strong>The opening:</strong> the cup is the one channel Coda already has in every cafe and restaurant it

@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { Icon, Slide, Src } from "../ui/primitives.jsx";
+import { useEffect, useState } from "react";
+import { Icon, Slide, useStep } from "../ui/primitives.jsx";
 
 /* ---------- The idea: a loop ---------- */
 export function IdeaSlide() {
   return (
-    <Slide title="Farm2Cup sends coffee down the chain. Cup2Farm sends thanks back up." sources={<Src>Case.</Src>}>
+    <Slide title="Farm2Cup sends coffee down the chain. Cup2Farm sends thanks back up.">
       <div className="loop">
         <svg className="loop__svg" viewBox="0 0 1456 450" aria-hidden="true">
           <defs>
@@ -61,7 +61,7 @@ const ADDS = [
 
 export function ExistsNewSlide() {
   return (
-    <Slide title="Most of the machinery already exists" sources={<Src>Case; Freethink.</Src>}>
+    <Slide title="Most of the machinery already exists">
       <div className="duo">
         <div className="duo__col">
           <h3 className="duo__head">Running today</h3>
@@ -95,7 +95,15 @@ export function ExistsNewSlide() {
 }
 
 /* ---------- Benevolence spectrum board ---------- */
-const ZONES = ["Product push", "Convenience", "Entertainment", "Product assistance", "Benevolent service"];
+// The five zones of Urban and Sultan's spectrum, left to right, in their terms.
+const ZONES = [
+  { name: "Product push", what: "Built to generate sales and promote deals. Coffee chain rewards apps sit here." },
+  { name: "Convenience", what: "On-the-go services, often tied to where you are." },
+  { name: "Entertainment", what: "Games and content that carry a brand’s values." },
+  { name: "Product assistance", what: "Advice on using a product, a short step from buying it. Starbucks’ bag tracing sits here." },
+  { name: "Benevolent service", what: "Help that is not tied to a sale and is meant to earn trust." },
+];
+const OURS = "Cup2Farm";
 
 // kind: "read" (examples in Urban and Sultan), "coffee" (our assessment), "ours"
 const APPS = [
@@ -113,32 +121,38 @@ const APPS = [
   { zone: 4, kind: "read", name: "Sea Tow", why: "Tides, weather and GPS for boaters, even though safer boating means fewer tows." },
 ];
 
+// The arrow crosses the spectrum one zone at a time, then lands on Cup2Farm.
+// Pointing at or clicking any chip shows that app instead, until the next press.
 export function SpectrumSlide() {
-  const [sel, setSel] = useState("Cup2Farm");
-  const app = APPS.find((a) => a.name === sel) || APPS[0];
+  const [step] = useStep();
+  const [picked, setPicked] = useState(null);
+  useEffect(() => setPicked(null), [step]);
+
+  const onOurs = step >= ZONES.length;
+  const zone = onOurs ? null : ZONES[step];
+  const sel = picked ?? (onOurs ? OURS : null);
+  const app = sel ? APPS.find((a) => a.name === sel) : null;
+
   return (
-    <Slide
-      title="Cup2Farm sits at the benevolent end of the spectrum"
-      sources={<Src>Urban and Sultan 2015 (spectrum and examples); Tea and Coffee Trade Journal 2020; CoinDesk 2020. Coffee placements are the team’s.</Src>}
-    >
+    <Slide title="Cup2Farm sits at the benevolent end">
       <div className="spec" data-noswipe>
         <div className="spec__axis" aria-hidden="true">
           <span>sells product</span>
           <span className="spec__bar" />
           <span>serves the customer</span>
         </div>
-        <div className="spec__board">
+        <div className={`spec__board ${zone && !picked ? "is-walking" : ""}`}>
           {ZONES.map((z, zi) => (
-            <div className="spec__zone" key={z}>
-              <h3 className="spec__zname">{z}</h3>
+            <div className={`spec__zone ${zone === z && !picked ? "is-on" : ""}`} key={z.name}>
+              <h3 className="spec__zname">{z.name}</h3>
               <div className="spec__chips">
                 {APPS.filter((a) => a.zone === zi).map((a) => (
                   <button
                     key={a.name}
                     className={`spec__chip spec__chip--${a.kind} ${a.name === sel ? "is-on" : ""}`}
-                    onClick={() => setSel(a.name)}
-                    onMouseEnter={() => setSel(a.name)}
-                    onFocus={() => setSel(a.name)}
+                    onClick={() => setPicked(a.name)}
+                    onMouseEnter={() => setPicked(a.name)}
+                    onFocus={() => setPicked(a.name)}
                     aria-pressed={a.name === sel}
                   >
                     {a.name}
@@ -150,7 +164,15 @@ export function SpectrumSlide() {
         </div>
         <div className="spec__foot">
           <p className="spec__detail" aria-live="polite">
-            <strong>{app.name}.</strong> {app.why}
+            {app ? (
+              <>
+                <strong>{app.name}.</strong> {app.why}
+              </>
+            ) : (
+              <>
+                <strong>{zone.name}.</strong> {zone.what}
+              </>
+            )}
           </p>
           <ul className="spec__legend">
             <li>
@@ -171,6 +193,7 @@ export function SpectrumSlide() {
     </Slide>
   );
 }
+SpectrumSlide.steps = ZONES.length + 1;
 
 /* ---------- Does / never does ---------- */
 const ALWAYS = [
@@ -189,7 +212,7 @@ const NEVER = [
 
 export function DoesDoesntSlide() {
   return (
-    <Slide title="What keeps it benevolent" sources={<Src>Urban and Sultan 2015; Lecture (data hype, value and trust).</Src>}>
+    <Slide title="What keeps it benevolent">
       <div className="duo">
         <div className="duo__col">
           <h3 className="duo__head">It always</h3>
@@ -246,7 +269,7 @@ const TRUST = [
 
 export function TrustSlide() {
   return (
-    <Slide title="Trust has three parts. Coda already has two." sources={<Src>Urban and Sultan 2015 (three factors of trust); Case.</Src>}>
+    <Slide title="Trust has three parts. Coda already has two.">
       <div className="trust">
         {TRUST.map((t) => (
           <div className={`trust__item ${t.has ? "" : "is-gap"}`} key={t.name}>
