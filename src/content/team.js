@@ -1,6 +1,6 @@
 // Who presents what. Edit here; the title slide, the agenda, the overview and the speaker
-// notes all read from this file. A slide does not say who presents it: that is shown in the
-// speaker notes and the overview only.
+// notes all read from this file. Content slides do not say who presents them; names appear on
+// the agenda and the handover slides, and in the speaker notes and the overview.
 //
 // Rules the deck is built around (checked by `npm test`):
 //   - every part has exactly one presenter

@@ -14,7 +14,10 @@ export const SECTIONS = [
   { no: null, label: "Q&A" },
 ];
 
-export const OUTLINE = [
+const partById = Object.fromEntries(PARTS.map((p) => [p.id, p]));
+
+// The talk as written. OUTLINE below adds a handover slide wherever the presenter changes.
+const TALK = [
   /* Opening */
   { id: "cup2farm", part: "opening", label: "Cup2Farm", secs: 15, notes: "Introduce the team and the brief in one breath: Coda asked for one benevolent area of a future web app. Ours is called Cup2Farm." },
   { id: "agenda", part: "opening", label: "Who presents what", secs: 15, notes: "Seven of us, each owning a part. We follow the assignment’s outline: the problem, the benevolent use case, the solution in detail, then expected outcomes." },
@@ -85,7 +88,36 @@ export const OUTLINE = [
   { id: "qa", part: "qa", label: "Q&A", secs: 0, notes: "Everyone answers. Nine likely questions have prepared answers: each press of the right arrow shows the next one, a click on a question jumps to it, and Escape returns to this slide." },
 ];
 
-const partById = Object.fromEntries(PARTS.map((p) => [p.id, p]));
+
+/** Speaking time given to each handover slide. */
+export const HANDOVER_SECS = 5;
+
+// Before the first slide of every speaking turn after the opening, the agenda comes back with
+// the incoming turn highlighted, so the room sees who is speaking next and where the talk is.
+// The handover belongs to the incoming part, so its time counts against the incoming speaker.
+// The Q&A gets none: everyone answers.
+function withHandovers(slides) {
+  const out = [];
+  let prev = null;
+  for (const s of slides) {
+    const { presenter } = partById[s.part];
+    if (prev && presenter !== prev && s.part !== "qa") {
+      out.push({
+        id: `next-${s.part}`,
+        part: s.part,
+        handover: true,
+        label: "Handover",
+        secs: HANDOVER_SECS,
+        notes: "The agenda again, with your turn lit. Say your name and what your part answers in one sentence, then press on.",
+      });
+    }
+    out.push(s);
+    prev = presenter;
+  }
+  return out;
+}
+
+export const OUTLINE = withHandovers(TALK);
 
 export const partOf = (slide) => partById[slide.part];
 export const sectionOf = (slide) => SECTIONS[partOf(slide).section];

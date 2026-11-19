@@ -1066,7 +1066,7 @@ a {
   grid-template-columns: 56px 400px 1fr;
   gap: 28px;
   align-items: baseline;
-  padding: 15px 0;
+  padding: 15px 24px;
   border-top: 1px solid var(--rule-2);
   line-height: 1.2;
 }
@@ -1094,7 +1094,7 @@ a {
 
 /* More than nine turns: tighten so the list still fits the stage */
 .agenda--dense .agenda__row {
-  padding: 8px 0;
+  padding: 8px 24px;
 }
 
 .agenda--dense .agenda__n,
@@ -1104,6 +1104,28 @@ a {
 
 .agenda--dense .agenda__part {
   font-size: 25px;
+}
+
+/* Handover: the agenda again. The incoming turn is lit the way a current step is elsewhere in
+   the deck, and the rest step back, as on the spectrum. */
+.agenda--handover .agenda__row:not(.is-now) {
+  opacity: 0.38;
+}
+
+.agenda--handover .agenda__row.is-now {
+  border-radius: 12px;
+  border-top-color: var(--cherry);
+  background: var(--cherry);
+  color: #fff;
+}
+
+.agenda--handover .agenda__row.is-now + .agenda__row {
+  border-top-color: transparent;
+}
+
+.agenda--handover .agenda__row.is-now .agenda__n,
+.agenda--handover .agenda__row.is-now .agenda__part {
+  color: #fff;
 }
 
 /* ---------- 1. Problem scoping ---------- */

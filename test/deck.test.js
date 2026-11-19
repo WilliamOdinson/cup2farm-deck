@@ -106,3 +106,18 @@ test("the QR code opens the deck's own address", () => {
   const rows = Array.from({ length: n }, (_, y) => Array.from({ length: n }, (_, x) => (qr.modules.get(x, y) ? "1" : "0")).join(""));
   assert.deepEqual(QR_ROWS, rows, 'src/content/qr.js is out of date. Run "npm run gen:qr".');
 });
+
+test("a handover slide opens every speaking turn after the first, except the Q&A", () => {
+  const list = turns();
+  for (const t of list.slice(1)) {
+    const first = OUTLINE.findIndex((s) => s.part === t.parts[0].id);
+    const slide = OUTLINE[first];
+    if (t.presenter === "Everyone") {
+      assert.ok(!slide.handover, "the Q&A has no handover slide");
+      continue;
+    }
+    assert.ok(slide.handover, `${t.presenter}'s turn does not open with a handover slide`);
+    assert.equal(slide.id, `next-${t.parts[0].id}`);
+  }
+  assert.equal(OUTLINE.filter((s) => s.handover).length, list.length - 2);
+});
