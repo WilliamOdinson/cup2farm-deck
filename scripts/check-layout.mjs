@@ -20,7 +20,7 @@ const measure = () => {
   const px = (n) => Math.round(n);
 
   for (const el of slide.querySelectorAll("*")) {
-    if (el.closest(".ph-body") || el.closest("svg") || el.closest(".qa__panel")) continue; // the phone scrolls by design
+    if (el.closest(".ph-body") || el.closest("svg")) continue; // the phone scrolls by design
     const r = el.getBoundingClientRect();
     if (r.width === 0 || r.height === 0) continue;
     const cs = getComputedStyle(el);
@@ -64,17 +64,6 @@ const measure = () => {
     }
   }
   return [...out];
-};
-
-// Runs in the page: the prepared-answers panel must cover the stage and hold its answer.
-const measurePanel = () => {
-  const stage = document.querySelector(".deck__stage").getBoundingClientRect();
-  const panel = document.querySelector(".qa__panel").getBoundingClientRect();
-  const answer = document.querySelector(".qa__a").getBoundingClientRect();
-  const out = [];
-  if (Math.abs(panel.top - stage.top) > 1 || Math.abs(panel.bottom - stage.bottom) > 1) out.push("panel does not cover the stage");
-  if (answer.bottom > panel.bottom - 20) out.push(`answer card runs past the panel by ${Math.round(answer.bottom - panel.bottom + 20)}px`);
-  return out;
 };
 
 // Runs in the page: where the deck is, and what the slide says there.
@@ -139,17 +128,6 @@ await run(async () => {
         await page.waitForTimeout(60);
         await check(label);
       }
-    }
-
-    // The prepared answers on the last slide.
-    await deck.show("qa");
-    await page.getByRole("button", { name: "Prepared answers" }).click();
-    const questions = page.locator(".qa__qs button");
-    const count = await questions.count();
-    for (let i = 0; i < count; i++) {
-      await questions.nth(i).click();
-      states += 1;
-      for (const found of await page.evaluate(measurePanel)) problems.push(`qa [answer ${i + 1}] ${found}`);
     }
   } finally {
     await deck.close();

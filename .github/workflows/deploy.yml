@@ -4,6 +4,22 @@ on:
   push:
     branches:
       - main
+    # Only changes to what the site or the PDF is built from deploy. A push that touches only
+    # docs, the README, tests, the standalone copy or the local tools (layout check,
+    # screenshots, QR generator) skips the run; "Run workflow" still deploys by hand.
+    paths:
+      - index.html
+      - src/**
+      - shims/**
+      - public/**
+      - vite.config.js
+      - package.json
+      - package-lock.json
+      - scripts/build-standalone.mjs
+      - scripts/export-pdf.mjs
+      - scripts/next-release-number.mjs
+      - scripts/lib/**
+      - .github/workflows/deploy.yml
   workflow_dispatch:
 
 # Read-only by default. The PDF job asks for write access, for itself only.

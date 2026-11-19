@@ -15,7 +15,6 @@ Live at **[95722-coda.pages.dev](https://95722-coda.pages.dev)**.
 - Stepped slides driven by the right arrow: timeline, supply chain, benevolence spectrum, prototype, data sources, ROI phases, scorecard, how it works and risk tabs
 - The references each slide cites in its footer, in APA 7 style, and the deck's address at bottom right
 - Speaker notes with per-slide timing and hand-over cues for seven presenters
-- Prepared answers for Q&A on the last slide
 - A PDF export with a page for every step, with real text and working links
 
 All lot, grower and receipt data in the prototype is sample data. Every QR code in the deck is real and opens the deck's own address.
@@ -30,9 +29,11 @@ All lot, grower and receipt data in the prototype is sample data. Every QR code 
 | O | Overview of all slides |
 | N | Speaker notes and timing |
 | F | Fullscreen |
-| Esc | Close the overview or the prepared answers |
+| Esc | Close the overview |
 
-The whole talk runs on the right arrow; nothing on a slide needs a click. On a slide with several states the control bar shows where you are, for example "step 2 of 7". Clicking a state still works, and the arrow carries on from there. On the Q&A slide each further press shows one prepared answer.
+The whole talk runs on the right arrow; nothing on a slide needs a click. On a slide with several states the control bar shows where you are, for example "step 2 of 7". Clicking a state still works, and the arrow carries on from there.
+
+Prepared answers to nine likely questions are in [`docs/qa.md`](docs/qa.md), to read before the talk. They are not in the deck.
 
 Presenter names appear on the slides only in the agenda and the handover slides. Timings appear only in the speaker notes (N) and the overview (O).
 
@@ -81,6 +82,7 @@ To use a Chrome that is already installed instead, set `CHROME_PATH` to its exec
 | References (APA 7) | `src/content/sources.js` |
 | Site address in the footer and the QR codes | `src/content/site.js`, then `npm run gen:qr` |
 | Styles | `src/styles.css` |
+| Prepared answers for the Q&A | `docs/qa.md` |
 
 `npm test` enforces the team's rules: every part has exactly one presenter, every member presents at least one part, the last slide is the Q&A, the talk fits in 30 minutes, and nobody speaks for more than six. It also checks that every slide cites references that exist, that every reference is used, and that the QR code matches the site address. Run `npm run check:layout` after changing text or references, since a longer sentence or a taller footer can overflow a slide.
 
@@ -105,7 +107,7 @@ npm run export:pdf                      # pdf/cup2farm-deck.pdf
 npm run export:pdf -- pdf/handout.pdf   # another file name
 ```
 
-The PDF has one 16:9 page for every state the right arrow reaches, in talk order (104 pages for the 51 slides today), without the speaker notes. Text stays text, the deck's fonts are embedded, and the links in the footers work.
+The PDF has one 16:9 page for every state the right arrow reaches, in talk order (95 pages for the 51 slides today), without the speaker notes. Text stays text, the deck's fonts are embedded, and the links in the footers work.
 
 It is printed from the deck's print view, which you can open yourself by adding `?print` to the address, for example `95722-coda.pages.dev/?print`. The browser's own print dialog works on that page too.
 
@@ -116,6 +118,8 @@ Every deploy publishes this PDF as a numbered GitHub Release; see [PDF releases]
 ## Deployment
 
 Pushing to `main` runs `.github/workflows/deploy.yml`, which tests, builds and deploys `dist/` to the Cloudflare Pages project `95722-coda`, and then releases the deck as a PDF.
+
+It runs only when the push changes something the site or the PDF is built from: `index.html`, `src/`, `shims/`, `public/`, `vite.config.js`, the package files, the build, export and release scripts, or the workflow itself. A push that changes only docs, the README, tests, the standalone file or the local tools does not deploy and does not cut a release. To deploy anyway, open the workflow in the Actions tab and choose Run workflow.
 
 ### PDF releases
 
