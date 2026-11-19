@@ -8,7 +8,8 @@ Live at **[95722-coda.pages.dev](https://95722-coda.pages.dev)**.
 
 ## What is in the deck
 
-- 45 slides, one idea each, on a fixed 1600 x 900 stage that scales to any screen
+- 51 slides, one idea each, on a fixed 1600 x 900 stage that scales to any screen
+- A handover slide at every change of speaker: the agenda again, with the next presenter and their part highlighted
 - A working phone prototype of the app: scan, see the journey, meet a grower, send thanks, open the passport
 - An ROI model with three phases and sliders, built on stated assumptions
 - Stepped slides driven by the right arrow: timeline, supply chain, benevolence spectrum, prototype, data sources, ROI phases, scorecard, how it works and risk tabs
@@ -33,7 +34,7 @@ All lot, grower and receipt data in the prototype is sample data. Every QR code 
 
 The whole talk runs on the right arrow; nothing on a slide needs a click. On a slide with several states the control bar shows where you are, for example "step 2 of 7". Clicking a state still works, and the arrow carries on from there. On the Q&A slide each further press shows one prepared answer.
 
-Presenter names and timings appear only in the speaker notes (N) and the overview (O), never on the slides.
+Presenter names appear on the slides only in the agenda and the handover slides. Timings appear only in the speaker notes (N) and the overview (O).
 
 Every slide has its own link, for example `95722-coda.pages.dev/#roi`.
 
@@ -83,7 +84,9 @@ To use a Chrome that is already installed instead, set `CHROME_PATH` to its exec
 
 `npm test` enforces the team's rules: every part has exactly one presenter, every member presents at least one part, the last slide is the Q&A, the talk fits in 30 minutes, and nobody speaks for more than six. It also checks that every slide cites references that exist, that every reference is used, and that the QR code matches the site address. Run `npm run check:layout` after changing text or references, since a longer sentence or a taller footer can overflow a slide.
 
-To add a slide, add an entry to `OUTLINE` in `src/content/outline.js` and register its component in `src/content/slides.jsx`. List what it cites in `refs`; the footer is drawn from that.
+Handover slides are generated in `src/content/outline.js` (`withHandovers`): one opens every speaking turn after the first, except the Q&A, and its 5 seconds count against the incoming speaker. Do not add them by hand.
+
+To add a slide, add an entry to `TALK` in `src/content/outline.js` and register its component in `src/content/slides.jsx`. List what it cites in `refs`; the footer is drawn from that.
 
 To give a slide several steps, set `steps` on its component and read the current one with `useStep()`:
 
@@ -102,7 +105,7 @@ npm run export:pdf                      # pdf/cup2farm-deck.pdf
 npm run export:pdf -- pdf/handout.pdf   # another file name
 ```
 
-The PDF has one 16:9 page for every state the right arrow reaches, in talk order (98 pages for the 45 slides today), without the speaker notes. Text stays text, the deck's fonts are embedded, and the links in the footers work.
+The PDF has one 16:9 page for every state the right arrow reaches, in talk order (104 pages for the 51 slides today), without the speaker notes. Text stays text, the deck's fonts are embedded, and the links in the footers work.
 
 It is printed from the deck's print view, which you can open yourself by adding `?print` to the address, for example `95722-coda.pages.dev/?print`. The browser's own print dialog works on that page too.
 

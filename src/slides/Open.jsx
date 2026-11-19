@@ -41,20 +41,25 @@ export function TitleSlide() {
 
 const COUNT_WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
 
-export function AgendaSlide() {
+/**
+ * The agenda: one row per speaking turn. With `current` (a part id) it is a handover slide:
+ * the same slide, with the turn that owns that part lit and the rest stepped back.
+ */
+export function AgendaSlide({ current = null }) {
   const rows = turns();
   const voices = TEAM.members.length;
   const word = COUNT_WORDS[voices] || String(voices);
+  const now = current ? rows.findIndex((t) => t.parts.some((p) => p.id === current)) : -1;
   let n = 0;
   return (
     <Slide title={`${word} ${voices === 1 ? "voice" : "voices"}, one recommendation`}>
-      <ol className={`agenda ${rows.length > 9 ? "agenda--dense" : ""}`}>
+      <ol className={`agenda ${rows.length > 9 ? "agenda--dense" : ""} ${now >= 0 ? "agenda--handover" : ""}`}>
         {rows.map((t, i) => {
           const isQa = t.parts.every((p) => p.id === "qa");
           const label = t.parts.map((p) => p.label).join(", ");
           if (!isQa) n += 1;
           return (
-            <li key={`${t.presenter}-${i}`} className="agenda__row">
+            <li key={`${t.presenter}-${i}`} className={`agenda__row ${i === now ? "is-now" : ""}`} aria-current={i === now ? "step" : undefined}>
               <span className="agenda__n">{isQa ? "" : n}</span>
               <span className="agenda__who">{t.presenter}</span>
               <span className="agenda__part">{label}</span>
@@ -64,6 +69,18 @@ export function AgendaSlide() {
       </ol>
     </Slide>
   );
+}
+
+const handovers = new Map();
+
+/** The handover slide for the turn that owns `partId`: the agenda with that turn highlighted. */
+export function handoverSlide(partId) {
+  if (!handovers.has(partId)) {
+    const Handover = () => <AgendaSlide current={partId} />;
+    Handover.displayName = `Handover(${partId})`;
+    handovers.set(partId, Handover);
+  }
+  return handovers.get(partId);
 }
 
 const STEPS = [
