@@ -85,7 +85,7 @@ const TALK = [
   { id: "brief", part: "close", label: "Meeting the brief", secs: 40, notes: "Seven things Coda asked for, and where we answered each. The next slide is Q&A." },
 
   /* The last slide */
-  { id: "qa", part: "qa", label: "Q&A", secs: 0, notes: "Everyone answers. Nine likely questions have prepared answers: each press of the right arrow shows the next one, a click on a question jumps to it, and Escape returns to this slide." },
+  { id: "qa", part: "qa", label: "Q&A", secs: 0, notes: "Everyone answers. Nine likely questions and their prepared answers are in docs/qa.md, to read before the talk." },
 ];
 
 

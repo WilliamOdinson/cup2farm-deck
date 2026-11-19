@@ -3937,139 +3937,9 @@ a {
   max-width: none;
 }
 
-.qa__btn {
-  margin-top: 28px;
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  border: 2px solid var(--gold);
-  background: none;
-  color: var(--gold);
-  border-radius: 999px;
-  padding: 12px 26px;
-  font-size: 24px;
-  font-weight: 700;
-}
-
-.qa__btn:hover {
-  background: var(--gold);
-  color: var(--oxblood-2);
-}
-
-.qa__btn svg {
-  font-size: 26px;
-}
-
 .qa__art {
   display: grid;
   place-items: center;
-}
-
-.qa__panel {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  background: var(--paper);
-  color: var(--ink);
-  padding: 46px 72px 40px;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Same spot as the address in every slide footer */
-.qa__site {
-  position: absolute;
-  right: 72px;
-  bottom: 28px;
-  color: var(--ink-2);
-}
-
-.qa__panel-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.qa__panel-head h3 {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 52px;
-}
-
-.qa__close {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 2px solid var(--ink);
-  background: none;
-  border-radius: 999px;
-  padding: 10px 22px;
-  font-size: 24px;
-  font-weight: 700;
-}
-
-.qa__cols {
-  display: grid;
-  grid-template-columns: 660px 1fr;
-  gap: 48px;
-  margin-top: 26px;
-  flex: 1;
-  min-height: 0;
-}
-
-.qa__qs {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 6px;
-  align-content: start;
-}
-
-.qa__qs button {
-  width: 100%;
-  text-align: left;
-  border: 2px solid transparent;
-  border-bottom-color: var(--rule);
-  background: none;
-  border-radius: 10px;
-  padding: 13px 16px;
-  font-size: 28px;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-.qa__qs button:hover {
-  background: var(--card);
-}
-
-.qa__qs button.is-on {
-  background: var(--cherry);
-  border-color: var(--cherry);
-  color: #fff;
-}
-
-.qa__a {
-  background: var(--card);
-  border: 1px solid var(--rule);
-  border-radius: 20px;
-  padding: 40px 46px 44px;
-  align-self: start;
-}
-
-.qa__a h4 {
-  margin: 0 0 18px;
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 48px;
-  line-height: 1.12;
-}
-
-.qa__a p {
-  margin: 0;
-  font-size: 38px;
-  line-height: 1.36;
 }
 
 /* Presenter in the overview and the speaker notes (presenter tools only) */
@@ -4166,9 +4036,4 @@ html[data-view="print"] *::after {
   .print__page + .print__page {
     break-before: page;
   }
-}
-
-/* A page cannot be closed, so the prepared answers lose their Close button in this view. */
-html[data-view="print"] .qa__close {
-  visibility: hidden;
 }
